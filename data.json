@@ -1,0 +1,37 @@
+{
+  "projects": [
+    {
+      "id": "p_demo",
+      "name": "General",
+      "createdAt": "2026-04-30T00:00:00.000Z"
+    },
+    {
+      "id": "p_mom5zu95_dm6ex0",
+      "name": "Test",
+      "createdAt": "2026-05-01T00:18:32.297Z"
+    }
+  ],
+  "notes": [
+    {
+      "id": "n_mom5yvsk_vfrfc6",
+      "title": "Test",
+      "content": "Esta es una anotacion de prueba.",
+      "projectId": "p_demo",
+      "tags": [
+        "Idea",
+        "test"
+      ],
+      "createdAt": "2026-05-01T00:17:47.636Z",
+      "updatedAt": "2026-05-01T00:17:47.636Z"
+    },
+    {
+      "id": "n_moq7nnno_r6vyke",
+      "title": "Anotaciones con Markdown",
+      "content": "# Esto es un titulo\n\nAqui podras realizar anotaciones en texto plano o darle formato usando **markdown** \n\n- Aqui la prueba de un lista \n`$bin/bash \n  Var = 1\n`",
+      "projectId": "p_demo",
+      "tags": [],
+      "createdAt": "2026-05-03T20:16:07.810Z",
+      "updatedAt": "2026-05-03T20:16:07.810Z"
+    }
+  ]
+}
