@@ -1118,6 +1118,13 @@
       vaultUnlockModal.classList.remove('show');
       vaultUnlockPassword.value = '';
       vaultUnlockPassword.dataset.vaultId = '';
+      // Resetear modal a estado inicial
+      vaultUnlockModal.querySelector('h2').textContent = 'Desbloquear: Bóveda';
+      vaultUnlockModal.querySelector('p').textContent = 'Esta nota está protegida en la bóveda. Ingresa tu contraseña maestra.';
+      // Limpiar acciones pendientes
+      pendingDeleteAction = null;
+      pendingNoteToOpen = null;
+      pendingNoteAction = 'view';
     }
 
     async function unlockVaultSubmit() {
@@ -1132,6 +1139,37 @@
       try {
         await api.send('POST', `/api/vaults/${vaultId}/verify`, { password });
         state.unlockedVaults[vaultId] = true;
+
+        // Si hay una acción de eliminación pendiente
+        if (pendingDeleteAction) {
+          const action = pendingDeleteAction;
+
+          // Si es eliminación de bóveda y requiere confirmación adicional
+          if (action.type === 'vault' && action.requiresConfirmation) {
+            closeVaultUnlock();
+            const confirmMsg = action.notesCount > 0
+              ? `¿Eliminar bóveda "${action.vaultName}"?\n\n⚠️ Se eliminarán ${action.notesCount} nota(s) dentro de esta bóveda.`
+              : `¿Eliminar bóveda "${action.vaultName}"?`;
+
+            if (!confirm(confirmMsg)) {
+              pendingDeleteAction = null;
+              return;
+            }
+            // Usuario confirmó, proceder con eliminación
+            pendingDeleteAction = null;
+            await performDeleteVault(action.vaultId, action.vaultName);
+            return;
+          }
+
+          // Para proyectos, proceder directamente
+          closeVaultUnlock();
+          pendingDeleteAction = null;
+          if (action.type === 'project') {
+            await performDeleteProject(action.projectId, action.projectName);
+          }
+          return;
+        }
+
         closeVaultUnlock();
 
         // Si estábamos abriendo una nota específica, solo mostrar la nota sin cambiar contexto
@@ -1148,7 +1186,7 @@
           return;
         }
 
-        // Si no hay nota pendiente, entrar en la bóveda normalmente
+        // Si no hay acción pendiente, entrar en la bóveda normalmente
         state.currentVaultId = vaultId;
         state.currentProjectId = null;
         // IMPORTANTE: Cargar datos ANTES de renderizar para evitar que notas desaparezcan
@@ -1160,6 +1198,7 @@
       } catch (err) {
         toast('Contraseña incorrecta', 'error');
         vaultUnlockPassword.value = '';
+        // No cerrar el modal para que el usuario pueda intentar de nuevo
       }
     }
 
@@ -1173,6 +1212,110 @@
       currentProjectTitle.textContent = 'Todas las notas';
       const vault = state.vaults.find(v => v.id === vaultId);
       toast(`🔒 Bóveda cerrada: ${vault.name}`, 'success');
+    }
+
+    // Variable para almacenar acción pendiente de eliminación
+    let pendingDeleteAction = null;
+
+    async function deleteProject(projectId) {
+      const project = state.projects.find(p => p.id === projectId);
+      if (!project) return;
+
+      const projectName = project.name;
+      const notesCount = state.notes.filter(n => n.projectId === projectId).length;
+
+      const confirmMsg = notesCount > 0
+        ? `¿Eliminar proyecto "${projectName}"?\n\n⚠️ Se eliminarán ${notesCount} nota(s) dentro de este proyecto.`
+        : `¿Eliminar proyecto "${projectName}"?`;
+
+      if (!confirm(confirmMsg)) return;
+
+      // Si el proyecto está en una bóveda, pedir confirmación de contraseña
+      if (project.vaultId) {
+        const vault = state.vaults.find(v => v.id === project.vaultId);
+        if (vault) {
+          pendingDeleteAction = {
+            type: 'project',
+            projectId: projectId,
+            projectName: projectName,
+            vaultId: vault.id,
+          };
+          vaultUnlockPassword.value = '';
+          vaultUnlockModal.classList.add('show');
+          vaultUnlockPassword.dataset.vaultId = vault.id;
+          vaultUnlockPassword.dataset.vaultName = vault.name;
+          vaultUnlockModal.querySelector('h2').textContent = `Confirmar eliminación: ${projectName}`;
+          vaultUnlockModal.querySelector('p').textContent = 'Ingresa la contraseña de la bóveda para confirmar la eliminación de este proyecto.';
+          vaultUnlockPassword.focus();
+          return;
+        }
+      }
+
+      // Proyecto global, proceder directamente
+      await performDeleteProject(projectId, projectName);
+    }
+
+    async function performDeleteProject(projectId, projectName) {
+      try {
+        await api.send('DELETE', `/api/projects/${projectId}`);
+        // Si estábamos viendo este proyecto, volver a "Todas las notas"
+        if (state.currentProjectId === projectId) {
+          state.currentProjectId = 'all';
+          state.currentVaultId = null;
+          currentProjectTitle.textContent = 'Todas las notas';
+        }
+        await loadAllProjects();
+        await loadAllNotesForTree();
+        renderSidebarTree();
+        renderNotesGrid(state.notes);
+        toast(`📁 Proyecto "${projectName}" eliminado`, 'success');
+      } catch (err) {
+        toast(`Error al eliminar proyecto: ${err.message}`, 'error');
+      }
+    }
+
+    async function deleteVault(vaultId) {
+      const vault = state.vaults.find(v => v.id === vaultId);
+      if (!vault) return;
+
+      const vaultName = vault.name;
+      const notesCount = state.notes.filter(n => n.vaultId === vaultId).length;
+
+      // Pedir contraseña PRIMERO, antes de confirmar eliminación
+      pendingDeleteAction = {
+        type: 'vault',
+        vaultId: vaultId,
+        vaultName: vaultName,
+        notesCount: notesCount,
+        requiresConfirmation: true, // Flag para indicar que necesita confirmación adicional
+      };
+      vaultUnlockPassword.value = '';
+      vaultUnlockModal.classList.add('show');
+      vaultUnlockPassword.dataset.vaultId = vaultId;
+      vaultUnlockPassword.dataset.vaultName = vaultName;
+      vaultUnlockModal.querySelector('h2').textContent = `Verificar identidad: ${vaultName}`;
+      vaultUnlockModal.querySelector('p').textContent = 'Ingresa la contraseña de la bóveda para proceder con la eliminación.';
+      vaultUnlockPassword.focus();
+    }
+
+    async function performDeleteVault(vaultId, vaultName) {
+      try {
+        await api.send('DELETE', `/api/vaults/${vaultId}`);
+        // Si estábamos dentro de esta bóveda, volver a "Todas las notas"
+        if (state.currentVaultId === vaultId) {
+          state.currentVaultId = null;
+          state.currentProjectId = 'all';
+          state.unlockedVaults[vaultId] = false;
+          currentProjectTitle.textContent = 'Todas las notas';
+        }
+        await loadVaults();
+        await loadAllNotesForTree();
+        renderSidebarTree();
+        renderNotesGrid(state.notes);
+        toast(`🔐 Bóveda "${vaultName}" eliminada`, 'success');
+      } catch (err) {
+        toast(`Error al eliminar bóveda: ${err.message}`, 'error');
+      }
     }
 
     // ---------- Render ----------
@@ -1247,12 +1390,29 @@
               <span class="tree-toggle ${projectCollapsed ? 'collapsed' : ''}">▼</span>
               <span style="flex: 1;">📁 ${escapeHtml(project.name)}</span>
               <span style="color: var(--text-dim); font-size: 12px;">${projectNotes.length}</span>
+              <button class="project-del-btn" style="background: transparent; border: none; color: var(--danger); cursor: pointer; font-size: 12px; padding: 2px 6px; opacity: 0;" title="Eliminar proyecto">🗑️</button>
             </div>
             <div class="tree-notes ${projectCollapsed ? 'collapsed' : ''}" style="display: flex; flex-direction: column; gap: 2px;"></div>
           `;
           const notesContainer = projectEl.querySelector('.tree-notes');
           const projectHeader = projectEl.querySelector('.tree-project-header');
           const projectToggle = projectEl.querySelector('.tree-toggle');
+          const projectDelBtn = projectEl.querySelector('.project-del-btn');
+
+          // Mostrar/ocultar botón de eliminar on hover
+          projectHeader.addEventListener('mouseenter', () => {
+            if (projectDelBtn) projectDelBtn.style.opacity = '1';
+          });
+          projectHeader.addEventListener('mouseleave', () => {
+            if (projectDelBtn) projectDelBtn.style.opacity = '0';
+          });
+
+          if (projectDelBtn) {
+            projectDelBtn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              deleteProject(project.id);
+            });
+          }
 
           projectHeader.addEventListener('click', (e) => {
             if (e.target.closest('.tree-toggle')) {
@@ -1266,7 +1426,7 @@
                 projectToggle.classList.add('collapsed');
                 localStorage.setItem(`tree-${projectId}`, 'collapsed');
               }
-            } else {
+            } else if (!e.target.closest('.project-del-btn')) {
               state.currentProjectId = project.id;
               state.currentVaultId = null;
               state.activeTag = '';
@@ -1342,6 +1502,7 @@
               <span style="flex: 1;">${lockIcon} ${escapeHtml(vault.name)}</span>
               <span style="color: var(--text-dim); font-size: 12px;">${totalVaultItems}</span>
               ${isUnlocked ? `<button class="vault-lock-btn" style="background: transparent; border: none; color: #f0748f; cursor: pointer; font-size: 12px; padding: 2px 6px; opacity: 0.7;" title="Cerrar bóveda">🔒</button>` : ''}
+              <button class="vault-del-btn" style="background: transparent; border: none; color: var(--danger); cursor: pointer; font-size: 12px; padding: 2px 6px; opacity: 0;" title="Eliminar bóveda">🗑️</button>
             </div>
             <div class="tree-notes ${vaultCollapsed ? 'collapsed' : ''}" style="display: flex; flex-direction: column; gap: 2px;"></div>
           `;
@@ -1349,11 +1510,27 @@
           const vaultHeader = vaultEl.querySelector('.tree-project-header');
           const vaultToggle = vaultEl.querySelector('.tree-toggle');
           const lockBtn = vaultEl.querySelector('.vault-lock-btn');
+          const delBtn = vaultEl.querySelector('.vault-del-btn');
+
+          // Mostrar/ocultar botones on hover
+          vaultHeader.addEventListener('mouseenter', () => {
+            if (delBtn) delBtn.style.opacity = '1';
+          });
+          vaultHeader.addEventListener('mouseleave', () => {
+            if (delBtn) delBtn.style.opacity = '0';
+          });
 
           if (lockBtn) {
             lockBtn.addEventListener('click', (e) => {
               e.stopPropagation();
               lockVault(vault.id);
+            });
+          }
+
+          if (delBtn) {
+            delBtn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              deleteVault(vault.id);
             });
           }
 
@@ -1369,7 +1546,7 @@
                 vaultToggle.classList.add('collapsed');
                 localStorage.setItem(`tree-${vaultId}`, 'collapsed');
               }
-            } else if (!e.target.closest('.vault-lock-btn')) {
+            } else if (!e.target.closest('.vault-lock-btn') && !e.target.closest('.vault-del-btn')) {
               if (!isUnlocked) openVaultUnlockModal(vault);
               else {
                 state.currentVaultId = vault.id;
@@ -1397,13 +1574,31 @@
                 <span class="tree-toggle ${projectCollapsed ? 'collapsed' : ''}">▼</span>
                 <span style="flex: 1;">📁 ${escapeHtml(project.name)}</span>
                 <span style="color: var(--text-dim); font-size: 12px;">${projectNotes.length}</span>
-                ${!isUnlocked ? '<span style="font-size: 11px; color: #f0748f;">🔒</span>' : ''}
+                ${!isUnlocked ? '<span style="font-size: 11px; color: #f0748f;">🔒</span>' : `<button class="vault-project-del-btn" style="background: transparent; border: none; color: var(--danger); cursor: pointer; font-size: 12px; padding: 2px 6px; opacity: 0;" title="Eliminar proyecto">🗑️</button>`}
               </div>
               <div class="tree-notes ${projectCollapsed ? 'collapsed' : ''}" style="display: flex; flex-direction: column; gap: 2px;"></div>
             `;
             const notesContainer = projectEl.querySelector('.tree-notes');
             const projectHeader = projectEl.querySelector('.tree-project-header');
             const projectToggle = projectEl.querySelector('.tree-toggle');
+            const projectDelBtn = projectEl.querySelector('.vault-project-del-btn');
+
+            // Mostrar/ocultar botón de eliminar on hover
+            if (isUnlocked) {
+              projectHeader.addEventListener('mouseenter', () => {
+                if (projectDelBtn) projectDelBtn.style.opacity = '1';
+              });
+              projectHeader.addEventListener('mouseleave', () => {
+                if (projectDelBtn) projectDelBtn.style.opacity = '0';
+              });
+            }
+
+            if (projectDelBtn) {
+              projectDelBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                deleteProject(project.id);
+              });
+            }
 
             projectHeader.addEventListener('click', (e) => {
               if (e.target.closest('.tree-toggle')) {
@@ -1417,7 +1612,7 @@
                   projectToggle.classList.add('collapsed');
                   localStorage.setItem(`tree-${projectId}`, 'collapsed');
                 }
-              } else if (isUnlocked) {
+              } else if (!e.target.closest('.vault-project-del-btn') && isUnlocked) {
                 state.currentProjectId = project.id;
                 state.currentVaultId = vault.id;
                 state.activeTag = '';

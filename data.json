@@ -7,12 +7,6 @@
       "createdAt": "2026-04-30T00:00:00.000Z"
     },
     {
-      "id": "p_mom5zu95_dm6ex0",
-      "name": "Test",
-      "vaultId": null,
-      "createdAt": "2026-05-01T00:18:32.297Z"
-    },
-    {
       "id": "p_mpizre2h_tmfcye",
       "name": "Nuevo",
       "vaultId": null,
@@ -27,159 +21,11 @@
   ],
   "vaults": [
     {
-      "id": "v_mpiywpl6_c06yvs",
-      "name": "LL",
-      "passwordHash": "b71892183990b4f40b98232709f6755b977727bac1e01aae1882eb769d62e67f:f449eea22908720498799465b05ea76b885b8696727edd86a787d533cce2adae110614c32d0d7fd9107e90a9c597b9d8347c3e5654a303c3abc3c94ccd4e45f4",
-      "createdAt": "2026-05-23T23:16:32.815Z"
-    },
-    {
       "id": "v_mpj0tw5q_l16g4p",
       "name": "Nueva",
       "passwordHash": "c101e6b087164772e4ad84a35317852bba3a0a7d4bd7ba11b40351377123a3a0:33f5dd4c8bfdb42add8e61f65d717345cc1afab12e0ca0ca3c155e1a0466341fe2cdeee69cbf004bc8c8c839fe334aa626876eeac858e81c6aad2b8aba73b9e5",
       "createdAt": "2026-05-24T00:10:20.597Z"
     }
   ],
-  "notes": [
-    {
-      "id": "n_mom5yvsk_vfrfc6",
-      "title": "Test",
-      "content": "Esta es una anotacion de prueba.",
-      "projectId": "p_demo",
-      "vaultId": null,
-      "tags": [
-        "Idea",
-        "test"
-      ],
-      "createdAt": "2026-05-01T00:17:47.636Z",
-      "updatedAt": "2026-05-01T00:17:47.636Z"
-    },
-    {
-      "id": "n_moq7nnno_r6vyke",
-      "title": "Anotaciones con Markdown",
-      "content": "# Esto es un titulo\n\nAqui podras realizar anotaciones en texto plano o darle formato usando **markdown** \n\n- Aqui la prueba de un lista \n`$bin/bash \n  Var = 1\n`",
-      "projectId": "p_demo",
-      "vaultId": null,
-      "tags": [],
-      "createdAt": "2026-05-03T20:16:07.810Z",
-      "updatedAt": "2026-05-03T20:16:07.810Z"
-    },
-    {
-      "id": "n_mp1phqpv_tsjeb3",
-      "title": "Control de deudas",
-      "content": "Didi tiene actualmente una deuda total de \n- **$9,744.00** \nPuedo tener la posibilidad de hacer una liquidación anticipada por la cantidad de \n- **$5,000.06**\n\nDeuda total tarjeta de crédito Nu Mexico con MSI \n- **$18,464.62**\n\nSaldo total en la cueta Banamex:\n\n- **$16,059.39**",
-      "projectId": "p_demo",
-      "vaultId": null,
-      "tags": [
-        "pagos",
-        "prestamos",
-        "deudas"
-      ],
-      "createdAt": "2026-05-11T21:20:52.867Z",
-      "updatedAt": "2026-05-11T21:45:15.685Z"
-    },
-    {
-      "id": "n_mpix5173_3zg4r8",
-      "title": "Aqui va una nota de prueba",
-      "content": "Esto es una nota de prueba para ver si esto funciona de manera correcta.\n\n**Aqui** *Otra cosa*",
-      "projectId": "p_mom5zu95_dm6ex0",
-      "vaultId": null,
-      "tags": [
-        "nota",
-        "prueba",
-        "test"
-      ],
-      "createdAt": "2026-05-23T22:27:01.839Z",
-      "updatedAt": "2026-05-23T22:27:01.839Z"
-    },
-    {
-      "id": "n_mpixe4e8_ou7bxc",
-      "title": "Encriptada",
-      "content": "Esta nota deberia de estar encriptada con la nueva implementacion.",
-      "projectId": "p_mom5zu95_dm6ex0",
-      "vaultId": null,
-      "tags": [],
-      "createdAt": "2026-05-23T22:34:05.888Z",
-      "updatedAt": "2026-05-23T22:34:05.888Z"
-    },
-    {
-      "id": "n_mpizcze7_ruf5za",
-      "title": "fdff",
-      "content": "ffff",
-      "projectId": null,
-      "vaultId": "v_mpiywpl6_c06yvs",
-      "tags": [],
-      "createdAt": "2026-05-23T23:29:11.983Z",
-      "updatedAt": "2026-05-23T23:29:11.983Z"
-    },
-    {
-      "id": "n_mpizdfpv_j85a0g",
-      "title": "fdff",
-      "content": "ffff",
-      "projectId": null,
-      "vaultId": "v_mpiywpl6_c06yvs",
-      "tags": [],
-      "createdAt": "2026-05-23T23:29:33.139Z",
-      "updatedAt": "2026-05-23T23:29:33.139Z"
-    },
-    {
-      "id": "n_mpizg0ar_gcked5",
-      "title": "fff",
-      "content": "fggggg",
-      "projectId": null,
-      "vaultId": "v_mpiywpl6_c06yvs",
-      "tags": [],
-      "createdAt": "2026-05-23T23:31:33.123Z",
-      "updatedAt": "2026-05-23T23:31:33.123Z"
-    },
-    {
-      "id": "n_mpizquns_75qu9g",
-      "title": "ddd",
-      "content": "gfdgdfg",
-      "projectId": null,
-      "vaultId": "v_mpiywpl6_c06yvs",
-      "tags": [],
-      "createdAt": "2026-05-23T23:39:59.032Z",
-      "updatedAt": "2026-05-23T23:39:59.032Z"
-    },
-    {
-      "id": "n_mpj04sb9_4bnfyj",
-      "title": "nota",
-      "content": "**Esta es una nueva nota dentro del proyecto de *nuevo***",
-      "projectId": "p_mpizre2h_tmfcye",
-      "vaultId": null,
-      "tags": [],
-      "createdAt": "2026-05-23T23:50:49.173Z",
-      "updatedAt": "2026-05-23T23:50:49.173Z"
-    },
-    {
-      "id": "n_mpj06ezd_4sh67s",
-      "title": "ddd",
-      "content": "dd",
-      "projectId": "p_mpizre2h_tmfcye",
-      "vaultId": null,
-      "tags": [],
-      "createdAt": "2026-05-23T23:52:05.209Z",
-      "updatedAt": "2026-05-23T23:52:05.209Z"
-    },
-    {
-      "id": "n_mpj0ugip_zj5sj7",
-      "title": "Nueva Boveda",
-      "content": "Esta nota esta dentro de una nueva boveda.",
-      "projectId": null,
-      "vaultId": "v_mpj0tw5q_l16g4p",
-      "tags": [],
-      "createdAt": "2026-05-24T00:10:46.945Z",
-      "updatedAt": "2026-05-24T00:10:46.945Z"
-    },
-    {
-      "id": "n_mpj106nc_zwcm8y",
-      "title": "nueva",
-      "content": "jajjajja",
-      "projectId": "p_mpj101rh_cv0zq7",
-      "vaultId": null,
-      "tags": [],
-      "createdAt": "2026-05-24T00:15:14.088Z",
-      "updatedAt": "2026-05-24T00:15:14.088Z"
-    }
-  ]
+  "notes": []
 }
