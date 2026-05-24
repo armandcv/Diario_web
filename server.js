@@ -646,26 +646,5 @@ app.delete('/api/notes/:id', authMiddleware, (req, res) => {
 
 // ---------- Arranque ----------
 app.listen(PORT, () => {
-  console.log('\n🔒 ========== DIARIO WEB (MULTI-USUARIO CON SEGURIDAD MEJORADA) ==========');
-  console.log(`📓 Corriendo en http://localhost:${PORT}`);
-  console.log(`🔐 Modo: ${NODE_ENV === 'production' ? '🛡️  PRODUCCIÓN' : '🧪 DESARROLLO'}`);
-  console.log('');
-  console.log('✅ MEJORAS DE SEGURIDAD IMPLEMENTADAS:');
-  console.log('   🔴 CRÍTICAS:');
-  console.log('      ✓ JWT_SECRET desde variable de entorno (obligatorio)');
-  console.log('      ✓ Validación de magic bytes en uploads');
-  console.log('      ✓ CORS configurado explícitamente');
-  console.log('      ✓ Rate limiting en auth endpoints');
-  console.log('');
-  console.log('   🟠 ALTAS:');
-  console.log('      ✓ Sanitización de inputs en búsquedas');
-  console.log('      ✓ Requisitos de contraseña más fuertes (12 chars + complejidad)');
-  console.log('      ✓ Helmet para headers HTTP seguros');
-  console.log('      ✓ Logging seguro');
-  console.log('');
-  console.log('⚠️  IMPORTANTE:');
-  console.log('   1. Configura el archivo .env con JWT_SECRET');
-  console.log('   2. Genera una clave: openssl rand -base64 32');
-  console.log('   3. Ejecuta: npm install');
-  console.log('   4. En producción: establece NODE_ENV=production\n');
+  console.log(`\n📓 Diario Web corriendo en http://localhost:${PORT}`);
 });
