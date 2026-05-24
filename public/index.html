@@ -38,6 +38,100 @@
       min-height: 100vh;
     }
 
+    /* ========== Pantalla de Login ========== */
+    .auth-screen {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .auth-screen.show { display: flex; }
+    .auth-container {
+      background: var(--bg-elev);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 40px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: var(--shadow);
+    }
+    .auth-logo {
+      text-align: center;
+      margin-bottom: 32px;
+      font-size: 48px;
+    }
+    .auth-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin: 0 0 24px 0;
+      text-align: center;
+    }
+    .auth-form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .auth-form input {
+      background: var(--bg-elev-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 14px;
+      outline: none;
+      transition: border-color 120ms ease;
+    }
+    .auth-form input:focus {
+      border-color: var(--accent);
+    }
+    .auth-form button {
+      background: var(--accent);
+      color: #0c1020;
+      border: none;
+      padding: 10px;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 120ms ease;
+    }
+    .auth-form button:hover { opacity: 0.92; }
+    .auth-toggle {
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 14px;
+      margin-top: 16px;
+    }
+    .auth-toggle button {
+      background: transparent;
+      color: var(--accent);
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      padding: 0;
+    }
+    .auth-error {
+      background: rgba(247, 118, 142, 0.15);
+      border: 1px solid rgba(247, 118, 142, 0.3);
+      color: #f0748f;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 13px;
+      text-align: center;
+      display: none;
+      margin-bottom: 12px;
+    }
+    .auth-error.show { display: block; }
+
+    /* ========== Contenedor principal (oculto sin autenticación) ========== */
+    .app-container {
+      display: none;
+      flex: 1;
+      width: 100%;
+    }
+    .app-container.show { display: flex; }
+
     /* ========== Sidebar ========== */
     aside {
       width: 260px;
@@ -61,6 +155,34 @@
       background: var(--accent);
       box-shadow: 0 0 12px var(--accent);
     }
+    .user-info {
+      padding: 10px;
+      background: var(--bg-elev-2);
+      border-radius: 8px;
+      font-size: 12px;
+      color: var(--text-dim);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .user-info span {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .user-info button {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .user-info button:hover {
+      border-color: var(--danger);
+      color: var(--danger);
+    }
     .section-title {
       font-size: 11px;
       text-transform: uppercase;
@@ -68,136 +190,6 @@
       color: var(--text-dim);
       margin: 6px 4px;
     }
-    .project-list {
-      list-style: none;
-      padding: 0; margin: 0;
-      display: flex; flex-direction: column; gap: 2px;
-    }
-    .project-item {
-      display: flex; justify-content: space-between; align-items: center;
-      padding: 8px 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      color: var(--text);
-      transition: background 120ms ease;
-      font-size: 14px;
-    }
-    .project-item:hover { background: var(--bg-elev-2); }
-    .project-item.active {
-      background: var(--accent-soft);
-      color: var(--accent);
-      font-weight: 600;
-    }
-    .project-item .del {
-      opacity: 0;
-      background: transparent;
-      border: none;
-      color: var(--text-dim);
-      cursor: pointer;
-      font-size: 14px;
-    }
-    .project-item:hover .del { opacity: 1; }
-    .project-item .del:hover { color: var(--danger); }
-
-    /* ========== Proyecto Expandible con Notas ========== */
-    .project-expandable {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-      border-radius: 8px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-      background: var(--bg-elev-2);
-      margin-bottom: 4px;
-    }
-    .project-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 8px 10px;
-      cursor: pointer;
-      color: var(--text);
-      transition: background 120ms ease;
-      font-size: 14px;
-      font-weight: 600;
-      background: var(--bg-elev);
-    }
-    .project-header:hover {
-      background: var(--bg-elev-2);
-    }
-    .project-header.active {
-      background: var(--accent-soft);
-      color: var(--accent);
-    }
-    .project-toggle {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 18px;
-      height: 18px;
-      font-size: 11px;
-      transition: transform 150ms ease;
-      margin-right: 6px;
-    }
-    .project-toggle.collapsed {
-      transform: rotate(-90deg);
-    }
-    .project-notes {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-      background: var(--bg-elev-2);
-      max-height: 1000px;
-      overflow: hidden;
-      transition: max-height 200ms ease, opacity 200ms ease;
-      opacity: 1;
-    }
-    .project-notes.collapsed {
-      max-height: 0;
-      opacity: 0;
-      pointer-events: none;
-    }
-    .note-item {
-      padding: 6px 10px 6px 28px;
-      cursor: pointer;
-      color: var(--text-dim);
-      font-size: 12px;
-      transition: background 120ms ease, color 120ms ease;
-      border-left: 2px solid transparent;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .note-item:hover {
-      background: var(--bg-elev);
-      color: var(--text);
-      border-left-color: var(--accent);
-    }
-    .note-item.active {
-      background: var(--accent-soft);
-      color: var(--accent);
-      border-left-color: var(--accent);
-    }
-
-    /* Estilos para bóvedas */
-    .project-item.vault {
-      background: rgba(240, 116, 143, 0.1);
-      border-left: 3px solid #f0748f;
-      padding-left: 7px;
-    }
-    .project-item.vault:hover {
-      background: rgba(240, 116, 143, 0.15);
-    }
-    .project-item.vault.active {
-      background: rgba(240, 116, 143, 0.25);
-      color: #f0748f;
-    }
-    .vault-lock-icon {
-      display: inline-block;
-      margin-right: 4px;
-      font-size: 12px;
-    }
-
     .new-project {
       display: flex;
       flex-direction: column;
@@ -334,7 +326,7 @@
       -webkit-mask-image: none;
     }
 
-    /* ========== Estilos Markdown ========== */
+    /* ========== Markdown ========== */
     .md h1, .md h2, .md h3, .md h4, .md h5, .md h6 {
       margin: 0.6em 0 0.3em;
       line-height: 1.25;
@@ -379,31 +371,8 @@
       border-radius: 0 6px 6px 0;
     }
     .md hr { border: 0; border-top: 1px solid var(--border); margin: 0.8em 0; }
-    .md table {
-      border-collapse: collapse;
-      margin: 0.5em 0;
-      font-size: 0.92em;
-    }
-    .md th, .md td {
-      border: 1px solid var(--border);
-      padding: 5px 9px;
-    }
-    .md th { background: var(--bg-elev-2); }
     .md img { max-width: 100%; border-radius: 6px; }
-    .md input[type="checkbox"] { margin-right: 6px; }
 
-    .expand-toggle {
-      background: transparent;
-      color: var(--text-dim);
-      border: none;
-      padding: 4px 0;
-      font-size: 12px;
-      cursor: pointer;
-      align-self: flex-start;
-    }
-    .expand-toggle:hover { color: var(--accent); }
-
-    /* Vista previa del editor */
     .preview-pane {
       background: var(--bg-elev-2);
       border: 1px dashed var(--border);
@@ -446,103 +415,7 @@
       border-radius: 12px;
     }
 
-    /* ========== Vista de Árbol ========== */
-    .tree-view {
-      background: var(--bg-elev);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: var(--shadow);
-    }
-    .tree-item {
-      margin: 0;
-      padding: 0;
-      list-style: none;
-    }
-    .tree-project {
-      margin-bottom: 12px;
-      border-left: 2px solid var(--accent-soft);
-      padding-left: 12px;
-    }
-    .tree-project-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 0;
-      cursor: pointer;
-      user-select: none;
-      font-weight: 600;
-      color: var(--text);
-    }
-    .tree-project-header:hover {
-      color: var(--accent);
-    }
-    .tree-toggle {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 20px;
-      height: 20px;
-      font-size: 12px;
-      transition: transform 150ms ease;
-    }
-    .tree-toggle.collapsed {
-      transform: rotate(-90deg);
-    }
-    .tree-notes {
-      margin-top: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      max-height: 1000px;
-      overflow: hidden;
-      transition: max-height 200ms ease, opacity 200ms ease;
-      opacity: 1;
-    }
-    .tree-notes.collapsed {
-      max-height: 0;
-      opacity: 0;
-      pointer-events: none;
-    }
-    .tree-note {
-      padding: 8px 12px;
-      background: var(--bg-elev-2);
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background 120ms ease;
-      font-size: 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-    }
-    .tree-note:hover {
-      background: var(--accent-soft);
-      color: var(--accent);
-    }
-    .tree-note-title {
-      flex: 1;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .tree-note-meta {
-      font-size: 12px;
-      color: var(--text-dim);
-      white-space: nowrap;
-    }
-    .tree-view-controls {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 16px;
-      justify-content: flex-end;
-    }
-    .tree-view-controls button {
-      padding: 6px 12px;
-      font-size: 12px;
-    }
-
-    /* ========== Bóveda / Cifrado ========== */
+    /* ========== Vault styles ========== */
     .vault-indicator {
       display: inline-flex;
       align-items: center;
@@ -561,7 +434,6 @@
     .note-card.locked:hover {
       border-color: #f0748f;
     }
-
     .vault-settings {
       margin-top: 12px;
       padding: 12px;
@@ -588,7 +460,7 @@
       font-size: 12px;
     }
 
-    /* ========== Modal de visualización ========== */
+    /* ========== Modales ========== */
     .modal {
       display: none;
       position: fixed;
@@ -686,7 +558,6 @@
       padding-top: 16px;
     }
 
-    /* ========== Modal de desbloqueo de bóveda ========== */
     .vault-modal {
       display: none;
       position: fixed;
@@ -754,7 +625,108 @@
     .toast.error { border-color: var(--danger); }
     .toast.success { border-color: var(--success); }
 
+    /* ========== Sidebar tree ========== */
+    .project-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      color: var(--text);
+      transition: background 120ms ease;
+      font-size: 14px;
+    }
+    .project-item:hover { background: var(--bg-elev-2); }
+    .project-item.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .project-item .del {
+      opacity: 0;
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .project-item:hover .del { opacity: 1; }
+    .project-item .del:hover { color: var(--danger); }
+
+    .tree-project {
+      margin-bottom: 12px;
+      border-left: 2px solid var(--accent-soft);
+      padding-left: 12px;
+    }
+    .tree-project-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 0;
+      cursor: pointer;
+      user-select: none;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .tree-project-header:hover {
+      color: var(--accent);
+    }
+    .tree-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      font-size: 12px;
+      transition: transform 150ms ease;
+    }
+    .tree-toggle.collapsed {
+      transform: rotate(-90deg);
+    }
+    .tree-notes {
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      max-height: 1000px;
+      overflow: hidden;
+      transition: max-height 200ms ease, opacity 200ms ease;
+      opacity: 1;
+    }
+    .tree-notes.collapsed {
+      max-height: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .tree-note {
+      padding: 8px 12px;
+      background: var(--bg-elev-2);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 120ms ease;
+      font-size: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .tree-note:hover {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .tree-note-title {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .tree-note-meta {
+      font-size: 12px;
+      color: var(--text-dim);
+      white-space: nowrap;
+    }
+
     @media (max-width: 720px) {
+      .auth-container { padding: 20px; }
       body { flex-direction: column; }
       aside { width: 100%; border-right: none; border-bottom: 1px solid var(--border); }
       main { padding: 18px; }
@@ -763,130 +735,154 @@
   </style>
 </head>
 <body>
-  <aside>
-    <div class="brand"><span class="dot"></span> Diario Web</div>
-
-    <div style="border-bottom: 1px solid var(--border); padding-bottom: 16px;">
-      <div class="section-title">➕ Nuevo contenedor</div>
-      <div style="display: flex; gap: 6px; margin-bottom: 10px;">
-        <select id="newItemType" style="flex: 1;">
-          <option value="project">📁 Proyecto</option>
-          <option value="vault">🔐 Bóveda</option>
-        </select>
-      </div>
-      <form class="new-project" id="newItemForm">
-        <input type="text" id="newItemName" placeholder="Nombre..." maxlength="60" required />
-        <input type="password" id="newItemPassword" placeholder="Contraseña..." maxlength="60" style="display:none;" />
-        <button type="submit" id="newItemBtn">+</button>
+  <!-- Pantalla de Autenticación -->
+  <div class="auth-screen" id="authScreen">
+    <div class="auth-container">
+      <div class="auth-logo">📓</div>
+      <h2 class="auth-title" id="authTitle">Inicia sesión</h2>
+      <div class="auth-error" id="authError"></div>
+      <form class="auth-form" id="authForm">
+        <input type="text" id="authUsername" placeholder="Nombre de usuario" required />
+        <input type="password" id="authPassword" placeholder="Contraseña" required />
+        <button type="submit">Ingresar</button>
       </form>
+      <div class="auth-toggle">
+        ¿No tienes cuenta? <button type="button" id="toggleAuthMode">Crear cuenta</button>
+      </div>
     </div>
+  </div>
 
-    <!-- Árbol jerárquico integrado en sidebar -->
-    <div id="sidebarTreeView" style="flex: 1; overflow-y: auto;"></div>
+  <!-- Aplicación Principal -->
+  <div class="app-container" id="appContainer">
+    <aside>
+      <div class="brand"><span class="dot"></span> Diario Web</div>
 
-    <div style="margin-top:auto; font-size: 11px; color: var(--text-dim);">
-      Tus datos se guardan en <code>data.json</code> · <span style="color: #f0748f;">cifrados</span>
-    </div>
-  </aside>
-
-  <main>
-    <div class="top-bar">
-      <h1 id="currentProjectTitle">Todas las notas</h1>
-      <input type="text" class="search" id="searchInput" placeholder="🔍 Buscar por título, contenido o tag..." />
-    </div>
-
-
-    <!-- Editor -->
-    <div class="editor">
-      <div class="row">
-        <input type="text" id="noteTitle" placeholder="Título de la nota" />
-        <input type="text" id="noteTags" placeholder="Tags separados por coma (ej: idea, urgente)" />
+      <div class="user-info">
+        <span>👤 <span id="userDisplay">Usuario</span></span>
+        <button id="logoutBtn">Salir</button>
       </div>
-      <div class="row">
-        <textarea id="noteContent" placeholder="Escribe tu anotación... Soporta **Markdown** (negritas, listas, código, enlaces, etc.)"></textarea>
-      </div>
-      <div id="previewWrap" style="display:none; margin-bottom:10px;">
-        <div class="md-hint" style="margin-bottom:6px;">Vista previa</div>
-        <div class="preview-pane md" id="previewPane"></div>
-      </div>
-      <div class="md-hint">
-        Markdown: <code>**negrita**</code> · <code>*cursiva*</code> · <code># título</code> · <code>- lista</code> · <code>[texto](url)</code> · <code>`código`</code> · <code>```bloque```</code>
-      </div>
-      <div class="row" style="align-items:center; margin-top:10px;">
-        <select id="noteProject"></select>
-        <div class="actions">
-          <button class="secondary" id="previewBtn" type="button">👁 Vista previa</button>
-          <button class="secondary" id="cancelEditBtn" type="button" style="display:none;">Cancelar</button>
-          <button id="saveNoteBtn" type="button">Guardar nota</button>
+
+      <div style="border-bottom: 1px solid var(--border); padding-bottom: 16px;">
+        <div class="section-title">➕ Nuevo contenedor</div>
+        <div style="display: flex; gap: 6px; margin-bottom: 10px;">
+          <select id="newItemType" style="flex: 1;">
+            <option value="project">📁 Proyecto</option>
+            <option value="vault">🔐 Bóveda</option>
+          </select>
         </div>
+        <form class="new-project" id="newItemForm">
+          <input type="text" id="newItemName" placeholder="Nombre..." maxlength="60" required />
+          <input type="password" id="newItemPassword" placeholder="Contraseña..." maxlength="60" style="display:none;" />
+          <button type="submit" id="newItemBtn">+</button>
+        </form>
       </div>
 
-      <!-- Ajustes de bóveda -->
-      <div class="vault-settings" id="vaultSettings" style="display:none;">
-        <label>🔐 Proteger con bóveda:</label>
-        <input type="password" id="vaultPassword" placeholder="Establece contraseña de bóveda..." />
-        <button class="secondary" type="button" id="toggleVaultBtn">Proteger</button>
-      </div>
-    </div>
+      <!-- Árbol jerárquico integrado en sidebar -->
+      <div id="sidebarTreeView" style="flex: 1; overflow-y: auto;"></div>
 
-    <!-- Notas -->
-    <div id="notesContainer"></div>
-  </main>
-
-  <!-- Modal para crear bóveda -->
-  <div class="modal" id="createVaultModal">
-    <div class="modal-content" style="max-width: 450px;">
-      <div class="modal-header">
-        <h2>🔐 Crear nueva bóveda</h2>
-        <button class="modal-close" id="createVaultClose">✕</button>
+      <div style="margin-top:auto; font-size: 11px; color: var(--text-dim);">
+        Tus datos se guardan en servidor · <span style="color: #f0748f;">cifrados</span>
       </div>
-      <form id="createVaultFormModal">
-        <div style="margin-bottom: 16px;">
-          <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px;">Nombre de la bóveda</label>
-          <input type="text" id="createVaultNameInput" placeholder="Ej: Información privada" maxlength="60" required />
+    </aside>
+
+    <main>
+      <div class="top-bar">
+        <h1 id="currentProjectTitle">Todas las notas</h1>
+        <input type="text" class="search" id="searchInput" placeholder="🔍 Buscar por título, contenido o tag..." />
+      </div>
+
+      <!-- Editor -->
+      <div class="editor">
+        <div class="row">
+          <input type="text" id="noteTitle" placeholder="Título de la nota" />
+          <input type="text" id="noteTags" placeholder="Tags separados por coma (ej: idea, urgente)" />
         </div>
-        <div style="margin-bottom: 16px;">
-          <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px;">Contraseña maestra</label>
-          <input type="password" id="createVaultPasswordInput" placeholder="Mínimo 8 caracteres, sin números consecutivos" required />
-          <div style="font-size: 12px; color: var(--text-dim); margin-top: 6px;">
-            💡 Debe tener mínimo 8 caracteres y no puede contener números consecutivos (ej: 12, 456). Se hashea con PBKDF2. Nunca se guarda en texto plano.
+        <div class="row">
+          <textarea id="noteContent" placeholder="Escribe tu anotación... Soporta **Markdown** (negritas, listas, código, enlaces, etc.)"></textarea>
+        </div>
+        <div id="previewWrap" style="display:none; margin-bottom:10px;">
+          <div class="md-hint" style="margin-bottom:6px;">Vista previa</div>
+          <div class="preview-pane md" id="previewPane"></div>
+        </div>
+        <div class="md-hint">
+          Markdown: <code>**negrita**</code> · <code>*cursiva*</code> · <code># título</code> · <code>- lista</code> · <code>[texto](url)</code> · <code>`código`</code> · <code>```bloque```</code>
+        </div>
+        <div class="row" style="align-items:center; margin-top:10px;">
+          <select id="noteProject"></select>
+          <div class="actions">
+            <button class="secondary" id="previewBtn" type="button">👁 Vista previa</button>
+            <button class="secondary" id="cancelEditBtn" type="button" style="display:none;">Cancelar</button>
+            <button id="saveNoteBtn" type="button">Guardar nota</button>
           </div>
         </div>
-        <div style="display: flex; gap: 8px; justify-content: flex-end;">
-          <button type="button" class="secondary" id="createVaultCancelBtn">Cancelar</button>
-          <button type="submit">Crear bóveda</button>
+
+        <!-- Ajustes de bóveda -->
+        <div class="vault-settings" id="vaultSettings" style="display:none;">
+          <label>🔐 Proteger con bóveda:</label>
+          <input type="password" id="vaultPassword" placeholder="Establece contraseña de bóveda..." />
+          <button class="secondary" type="button" id="toggleVaultBtn">Proteger</button>
         </div>
-      </form>
-    </div>
-  </div>
+      </div>
 
-  <!-- Modal para desbloquear bóveda -->
-  <div class="vault-modal" id="vaultUnlockModal">
-    <div class="vault-modal-content">
-      <div class="vault-modal-icon">🔒</div>
-      <h2>Nota protegida</h2>
-      <p>Esta nota está protegida en la bóveda. Ingresa tu contraseña maestra.</p>
-      <input type="password" id="vaultUnlockPassword" placeholder="Contraseña de bóveda..." />
-      <div class="vault-modal-actions">
-        <button class="secondary" id="vaultCancelBtn" type="button">Cancelar</button>
-        <button id="vaultUnlockBtn" type="button">Desbloquear</button>
+      <!-- Notas -->
+      <div id="notesContainer"></div>
+    </main>
+
+    <!-- Modal para crear bóveda -->
+    <div class="modal" id="createVaultModal">
+      <div class="modal-content" style="max-width: 450px;">
+        <div class="modal-header">
+          <h2>🔐 Crear nueva bóveda</h2>
+          <button class="modal-close" id="createVaultClose">✕</button>
+        </div>
+        <form id="createVaultFormModal">
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px;">Nombre de la bóveda</label>
+            <input type="text" id="createVaultNameInput" placeholder="Ej: Información privada" maxlength="60" required />
+          </div>
+          <div style="margin-bottom: 16px;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px;">Contraseña maestra</label>
+            <input type="password" id="createVaultPasswordInput" placeholder="Mínimo 8 caracteres, sin números consecutivos" required />
+            <div style="font-size: 12px; color: var(--text-dim); margin-top: 6px;">
+              💡 Debe tener mínimo 8 caracteres y no puede contener números consecutivos (ej: 12, 456). Se hashea con PBKDF2. Nunca se guarda en texto plano.
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px; justify-content: flex-end;">
+            <button type="button" class="secondary" id="createVaultCancelBtn">Cancelar</button>
+            <button type="submit">Crear bóveda</button>
+          </div>
+        </form>
       </div>
     </div>
-  </div>
 
-  <!-- Modal de visualización -->
-  <div class="modal" id="viewModal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h2 id="modalTitle"></h2>
-        <button class="modal-close" id="modalClose">✕</button>
+    <!-- Modal para desbloquear bóveda -->
+    <div class="vault-modal" id="vaultUnlockModal">
+      <div class="vault-modal-content">
+        <div class="vault-modal-icon">🔒</div>
+        <h2>Nota protegida</h2>
+        <p>Esta nota está protegida en la bóveda. Ingresa tu contraseña maestra.</p>
+        <input type="password" id="vaultUnlockPassword" placeholder="Contraseña de bóveda..." />
+        <div class="vault-modal-actions">
+          <button class="secondary" id="vaultCancelBtn" type="button">Cancelar</button>
+          <button id="vaultUnlockBtn" type="button">Desbloquear</button>
+        </div>
       </div>
-      <div id="modalMeta" class="modal-meta"></div>
-      <div id="modalBody" class="modal-body md"></div>
-      <div id="modalTags" class="modal-tags"></div>
-      <div class="modal-actions">
-        <button class="secondary" id="modalCloseBtn">Cerrar</button>
-        <button id="modalEditBtn">✏️ Editar nota</button>
+    </div>
+
+    <!-- Modal de visualización -->
+    <div class="modal" id="viewModal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 id="modalTitle"></h2>
+          <button class="modal-close" id="modalClose">✕</button>
+        </div>
+        <div id="modalMeta" class="modal-meta"></div>
+        <div id="modalBody" class="modal-body md"></div>
+        <div id="modalTags" class="modal-tags"></div>
+        <div class="modal-actions">
+          <button class="secondary" id="modalCloseBtn">Cerrar</button>
+          <button id="modalEditBtn">✏️ Editar nota</button>
+        </div>
       </div>
     </div>
   </div>
@@ -898,8 +894,8 @@
     // ---------- Markdown ----------
     if (window.marked) {
       marked.setOptions({
-        gfm: true,        // GitHub-flavored markdown (tablas, ~~tachado~~, etc.)
-        breaks: true,     // Saltos de línea simples = <br>
+        gfm: true,
+        breaks: true,
       });
     }
     function renderMarkdown(text) {
@@ -912,25 +908,71 @@
       }
     }
 
+    // ---------- API con autenticación JWT ----------
     const api = {
+      getToken() {
+        return localStorage.getItem('diario_token');
+      },
+      setToken(token) {
+        if (token) {
+          localStorage.setItem('diario_token', token);
+        } else {
+          localStorage.removeItem('diario_token');
+        }
+      },
       async get(path) {
-        const r = await fetch(path);
-        if (!r.ok) throw new Error((await r.json()).error || r.statusText);
+        const r = await fetch(path, {
+          headers: { 'Authorization': `Bearer ${this.getToken()}` }
+        });
+        if (!r.ok) {
+          if (r.status === 401) {
+            state.logout();
+          }
+          throw new Error((await r.json()).error || r.statusText);
+        }
         return r.json();
       },
       async send(method, path, body) {
         const r = await fetch(path, {
           method,
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.getToken()}`
+          },
           body: body ? JSON.stringify(body) : undefined,
         });
         if (!r.ok) {
+          if (r.status === 401) {
+            state.logout();
+          }
           let msg = r.statusText;
           try { msg = (await r.json()).error || msg; } catch {}
           throw new Error(msg);
         }
         return r.json();
       },
+      async register(username, password) {
+        const r = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        if (!r.ok) {
+          throw new Error((await r.json()).error || r.statusText);
+        }
+        return r.json();
+      },
+      async login(username, password) {
+        const r = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        if (!r.ok) {
+          throw new Error((await r.json()).error || r.statusText);
+        }
+        return r.json();
+      }
     };
 
     // ---------- Estado ----------
@@ -943,13 +985,39 @@
       search: '',
       activeTag: '',
       editingNoteId: null,
-      unlockedVaults: {}, // { vaultId: true } para bóvedas desbloqueadas en esta sesión
+      unlockedVaults: {},
+      isAuthenticated: false,
+      userId: null,
+      username: null,
+
+      logout() {
+        api.setToken(null);
+        this.isAuthenticated = false;
+        this.userId = null;
+        this.username = null;
+        this.projects = [];
+        this.vaults = [];
+        this.notes = [];
+        showAuthScreen();
+      }
     };
 
-    // ---------- Elementos ----------
+    // ---------- Elementos del DOM ----------
     const $ = (sel) => document.querySelector(sel);
-    const projectList = $('#projectList');
-    const vaultList = $('#vaultList');
+
+    // Auth
+    const authScreen = $('#authScreen');
+    const authForm = $('#authForm');
+    const authTitle = $('#authTitle');
+    const authError = $('#authError');
+    const authUsername = $('#authUsername');
+    const authPassword = $('#authPassword');
+    const toggleAuthMode = $('#toggleAuthMode');
+    const appContainer = $('#appContainer');
+    const logoutBtn = $('#logoutBtn');
+    const userDisplay = $('#userDisplay');
+
+    // App
     const noteProjectSelect = $('#noteProject');
     const notesContainer = $('#notesContainer');
     const currentProjectTitle = $('#currentProjectTitle');
@@ -968,7 +1036,7 @@
     const newItemPassword = $('#newItemPassword');
     const newItemBtn = $('#newItemBtn');
 
-    // Modal
+    // Modales
     const viewModal = $('#viewModal');
     const modalTitle = $('#modalTitle');
     const modalMeta = $('#modalMeta');
@@ -978,13 +1046,19 @@
     const modalCloseBtn = $('#modalCloseBtn');
     const modalEditBtn = $('#modalEditBtn');
 
-    // Vault
+    const createVaultModal = $('#createVaultModal');
+    const createVaultNameInput = $('#createVaultNameInput');
+    const createVaultPasswordInput = $('#createVaultPasswordInput');
+    const createVaultFormModal = $('#createVaultFormModal');
+    const createVaultClose = $('#createVaultClose');
+    const createVaultCancelBtn = $('#createVaultCancelBtn');
+
     const vaultUnlockModal = $('#vaultUnlockModal');
     const vaultUnlockPassword = $('#vaultUnlockPassword');
     const vaultUnlockBtn = $('#vaultUnlockBtn');
     const vaultCancelBtn = $('#vaultCancelBtn');
 
-    // ---------- Toast ----------
+    // Toast
     const toastEl = $('#toast');
     let toastTimer;
     function toast(msg, type = '') {
@@ -994,25 +1068,91 @@
       toastTimer = setTimeout(() => { toastEl.className = 'toast ' + type; }, 2400);
     }
 
-    // ---------- Modal ----------
-    // Variable para almacenar la nota pendiente de abrir después de desbloquear bóveda
-    let pendingNoteToOpen = null;
-    let pendingNoteAction = 'view'; // 'view' o 'edit'
+    // ---------- Autenticación ----------
+    let authIsLogin = true;
 
-    // Función para abrir nota con verificación de bóveda
+    function showAuthScreen() {
+      authScreen.classList.add('show');
+      appContainer.classList.remove('show');
+      authError.classList.remove('show');
+      authUsername.value = '';
+      authPassword.value = '';
+      authUsername.focus();
+    }
+
+    function showAppScreen() {
+      authScreen.classList.remove('show');
+      appContainer.classList.add('show');
+    }
+
+    toggleAuthMode.addEventListener('click', (e) => {
+      e.preventDefault();
+      authIsLogin = !authIsLogin;
+      authTitle.textContent = authIsLogin ? 'Inicia sesión' : 'Crear cuenta';
+      authForm.querySelector('button').textContent = authIsLogin ? 'Ingresar' : 'Crear cuenta';
+      toggleAuthMode.textContent = authIsLogin ? 'Crear cuenta' : 'Inicia sesión';
+      authError.classList.remove('show');
+      authUsername.value = '';
+      authPassword.value = '';
+      authUsername.focus();
+    });
+
+    authForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = authUsername.value.trim();
+      const password = authPassword.value;
+
+      if (!username || !password) {
+        showAuthError('Usuario y contraseña requeridos');
+        return;
+      }
+
+      try {
+        const result = authIsLogin
+          ? await api.login(username, password)
+          : await api.register(username, password);
+
+        api.setToken(result.token);
+        state.isAuthenticated = true;
+        state.userId = result.id;
+        state.username = result.username;
+        userDisplay.textContent = result.username;
+
+        showAppScreen();
+        await loadAllProjects();
+        await loadVaults();
+        await loadNotes();
+      } catch (err) {
+        showAuthError(err.message);
+      }
+    });
+
+    function showAuthError(msg) {
+      authError.textContent = msg;
+      authError.classList.add('show');
+    }
+
+    logoutBtn.addEventListener('click', () => {
+      if (confirm('¿Cerrar sesión?')) {
+        state.logout();
+      }
+    });
+
+    // ---------- Funciones principales ----------
+    let pendingNoteToOpen = null;
+    let pendingNoteAction = 'view';
+    let pendingDeleteAction = null;
+
     function openNoteWithVaultCheck(note, action = 'view') {
-      // Si la nota está en una bóveda bloqueada, pedir desbloqueo primero
       if (note.vaultId) {
         const vault = state.vaults.find(v => v.id === note.vaultId);
         if (vault && !state.unlockedVaults[vault.id]) {
-          // La bóveda está bloqueada, pedir desbloqueo
           pendingNoteToOpen = note;
           pendingNoteAction = action;
           openVaultUnlockModal(vault);
           return;
         }
       }
-      // La nota no está en bóveda o la bóveda está desbloqueada
       if (action === 'edit') {
         startEdit(note);
       } else {
@@ -1053,21 +1193,19 @@
       viewModal.classList.remove('show');
     }
 
-    // ---------- Funciones de Bóvedas ----------
+    // ---------- Bóvedas ----------
     async function loadVaults() {
       state.vaults = await api.get('/api/vaults');
       renderVaults();
     }
 
-    // Cargar TODOS los proyectos (globales + de bóvedas)
     async function loadAllProjects() {
       state.projects = await api.get('/api/projects');
       renderProjects();
     }
 
-    // Cargar proyectos (globales o de una bóveda) - para contexto actual
     async function loadProjectsForContext() {
-      await loadAllProjects(); // Siempre cargar todos
+      await loadAllProjects();
     }
 
     function openCreateVaultModal() {
@@ -1083,20 +1221,14 @@
       createVaultPasswordInput.value = '';
     }
 
-    // Validar contraseña de bóveda
     function validateVaultPassword(password) {
-      // Requisito 1: Mínimo 8 caracteres
       if (password.length < 8) {
         return 'La contraseña debe tener mínimo 8 caracteres';
       }
-
-      // Requisito 2: No puede tener números consecutivos
-      // Detectar si hay dos o más dígitos seguidos
       if (/\d(?=\d)/.test(password)) {
         return 'La contraseña no puede contener números consecutivos (ej: 12, 456)';
       }
-
-      return null; // Sin errores
+      return null;
     }
 
     async function createVault(e) {
@@ -1109,7 +1241,6 @@
         return;
       }
 
-      // Validar contraseña
       const passwordError = validateVaultPassword(password);
       if (passwordError) {
         toast(passwordError, 'error');
@@ -1139,10 +1270,8 @@
       vaultUnlockModal.classList.remove('show');
       vaultUnlockPassword.value = '';
       vaultUnlockPassword.dataset.vaultId = '';
-      // Resetear modal a estado inicial
       vaultUnlockModal.querySelector('h2').textContent = 'Desbloquear: Bóveda';
       vaultUnlockModal.querySelector('p').textContent = 'Esta nota está protegida en la bóveda. Ingresa tu contraseña maestra.';
-      // Limpiar acciones pendientes
       pendingDeleteAction = null;
       pendingNoteToOpen = null;
       pendingNoteAction = 'view';
@@ -1161,28 +1290,22 @@
         await api.send('POST', `/api/vaults/${vaultId}/verify`, { password });
         state.unlockedVaults[vaultId] = true;
 
-        // Si hay una acción de eliminación pendiente
         if (pendingDeleteAction) {
           const action = pendingDeleteAction;
-
-          // Si es eliminación de bóveda y requiere confirmación adicional
           if (action.type === 'vault' && action.requiresConfirmation) {
             closeVaultUnlock();
             const confirmMsg = action.notesCount > 0
               ? `¿Eliminar bóveda "${action.vaultName}"?\n\n⚠️ Se eliminarán ${action.notesCount} nota(s) dentro de esta bóveda.`
               : `¿Eliminar bóveda "${action.vaultName}"?`;
-
             if (!confirm(confirmMsg)) {
               pendingDeleteAction = null;
               return;
             }
-            // Usuario confirmó, proceder con eliminación
             pendingDeleteAction = null;
             await performDeleteVault(action.vaultId, action.vaultName);
             return;
           }
 
-          // Para proyectos, proceder directamente
           closeVaultUnlock();
           pendingDeleteAction = null;
           if (action.type === 'project') {
@@ -1193,7 +1316,6 @@
 
         closeVaultUnlock();
 
-        // Si estábamos abriendo una nota específica, solo mostrar la nota sin cambiar contexto
         if (pendingNoteToOpen) {
           const note = pendingNoteToOpen;
           const action = pendingNoteAction;
@@ -1207,19 +1329,16 @@
           return;
         }
 
-        // Si no hay acción pendiente, entrar en la bóveda normalmente
         state.currentVaultId = vaultId;
         state.currentProjectId = null;
-        // IMPORTANTE: Cargar datos ANTES de renderizar para evitar que notas desaparezcan
-        await loadProjectsForContext(); // Cargar proyectos de la bóveda
-        await loadNotes(); // Esto llamará a renderSidebarTree() al final
+        await loadProjectsForContext();
+        await loadNotes();
         const vault = state.vaults.find(v => v.id === vaultId);
         currentProjectTitle.textContent = `🔓 ${vault.name}`;
         toast(`✅ Bóveda desbloqueada: ${vault.name}`, 'success');
       } catch (err) {
         toast('Contraseña incorrecta', 'error');
         vaultUnlockPassword.value = '';
-        // No cerrar el modal para que el usuario pueda intentar de nuevo
       }
     }
 
@@ -1235,23 +1354,18 @@
       toast(`🔒 Bóveda cerrada: ${vault.name}`, 'success');
     }
 
-    // Variable para almacenar acción pendiente de eliminación
-    let pendingDeleteAction = null;
-
     async function deleteProject(projectId) {
       const project = state.projects.find(p => p.id === projectId);
       if (!project) return;
 
       const projectName = project.name;
       const notesCount = state.notes.filter(n => n.projectId === projectId).length;
-
       const confirmMsg = notesCount > 0
         ? `¿Eliminar proyecto "${projectName}"?\n\n⚠️ Se eliminarán ${notesCount} nota(s) dentro de este proyecto.`
         : `¿Eliminar proyecto "${projectName}"?`;
 
       if (!confirm(confirmMsg)) return;
 
-      // Si el proyecto está en una bóveda, pedir confirmación de contraseña
       if (project.vaultId) {
         const vault = state.vaults.find(v => v.id === project.vaultId);
         if (vault) {
@@ -1272,14 +1386,12 @@
         }
       }
 
-      // Proyecto global, proceder directamente
       await performDeleteProject(projectId, projectName);
     }
 
     async function performDeleteProject(projectId, projectName) {
       try {
         await api.send('DELETE', `/api/projects/${projectId}`);
-        // Si estábamos viendo este proyecto, volver a "Todas las notas"
         if (state.currentProjectId === projectId) {
           state.currentProjectId = 'all';
           state.currentVaultId = null;
@@ -1302,13 +1414,12 @@
       const vaultName = vault.name;
       const notesCount = state.notes.filter(n => n.vaultId === vaultId).length;
 
-      // Pedir contraseña PRIMERO, antes de confirmar eliminación
       pendingDeleteAction = {
         type: 'vault',
         vaultId: vaultId,
         vaultName: vaultName,
         notesCount: notesCount,
-        requiresConfirmation: true, // Flag para indicar que necesita confirmación adicional
+        requiresConfirmation: true,
       };
       vaultUnlockPassword.value = '';
       vaultUnlockModal.classList.add('show');
@@ -1322,7 +1433,6 @@
     async function performDeleteVault(vaultId, vaultName) {
       try {
         await api.send('DELETE', `/api/vaults/${vaultId}`);
-        // Si estábamos dentro de esta bóveda, volver a "Todas las notas"
         if (state.currentVaultId === vaultId) {
           state.currentVaultId = null;
           state.currentProjectId = 'all';
@@ -1339,14 +1449,12 @@
       }
     }
 
-    // ---------- Render ----------
-        // ---------- Vista Árbol Integrada en Sidebar ----------
+    // ---------- Render UI ----------
     function renderSidebarTree() {
       const treeContainer = $('#sidebarTreeView');
       if (!treeContainer) return;
       treeContainer.innerHTML = '';
 
-      // Botón "Todas las notas"
       const allBtn = document.createElement('div');
       allBtn.className = 'tree-project';
       allBtn.style.borderLeft = 'none';
@@ -1420,7 +1528,6 @@
           const projectToggle = projectEl.querySelector('.tree-toggle');
           const projectDelBtn = projectEl.querySelector('.project-del-btn');
 
-          // Mostrar/ocultar botón de eliminar on hover
           projectHeader.addEventListener('mouseenter', () => {
             if (projectDelBtn) projectDelBtn.style.opacity = '1';
           });
@@ -1508,7 +1615,6 @@
           const isUnlocked = state.unlockedVaults[vault.id];
           const lockIcon = isUnlocked ? '🔓' : '🔒';
           const vaultProjects = state.projects.filter(p => p.vaultId === vault.id);
-          // Contar notas totales en la bóveda (con proyecto + sin proyecto)
           const vaultNotes = state.notes.filter(n => n.vaultId === vault.id);
           const totalVaultItems = vaultNotes.length;
           const vaultId = `vault-${vault.id}`;
@@ -1533,7 +1639,6 @@
           const lockBtn = vaultEl.querySelector('.vault-lock-btn');
           const delBtn = vaultEl.querySelector('.vault-del-btn');
 
-          // Mostrar/ocultar botones on hover
           vaultHeader.addEventListener('mouseenter', () => {
             if (delBtn) delBtn.style.opacity = '1';
           });
@@ -1579,8 +1684,6 @@
             }
           });
 
-          // Mostrar estructura de proyectos incluso si está bloqueada
-          // Si está desbloqueada, mostrar proyectos y notas; si no, solo la estructura del proyecto sin notas
           vaultProjects.forEach(project => {
             const projectNotes = isUnlocked ? state.notes.filter(n => n.projectId === project.id && n.vaultId === vault.id) : [];
             const projectId = `project-${project.id}`;
@@ -1604,7 +1707,6 @@
             const projectToggle = projectEl.querySelector('.tree-toggle');
             const projectDelBtn = projectEl.querySelector('.vault-project-del-btn');
 
-            // Mostrar/ocultar botón de eliminar on hover
             if (isUnlocked) {
               projectHeader.addEventListener('mouseenter', () => {
                 if (projectDelBtn) projectDelBtn.style.opacity = '1';
@@ -1655,7 +1757,6 @@
             vaultContent.appendChild(projectEl);
           });
 
-          // Notas sin proyecto (directamente en la bóveda)
           if (isUnlocked) {
             const notesWithoutProject = state.notes.filter(n => n.vaultId === vault.id && !n.projectId);
             if (notesWithoutProject.length > 0) {
@@ -1705,7 +1806,6 @@
             }
           }
 
-          // Si la bóveda está desbloqueada pero no tiene proyectos ni notas, mostrar nota
           if (isUnlocked && vaultProjects.length === 0 && state.notes.filter(n => n.vaultId === vault.id && !n.projectId).length === 0) {
             const emptyEl = document.createElement('div');
             emptyEl.style.cssText = 'padding: 12px 24px; color: var(--text-dim); font-size: 13px; font-style: italic;';
@@ -1734,7 +1834,6 @@
       // Actualizar select del editor
       noteProjectSelect.innerHTML = '';
 
-      // Si estamos en una bóveda, mostrar solo sus proyectos
       if (state.currentVaultId) {
         const vaultProjects = state.projects.filter(p => p.vaultId === state.currentVaultId);
         if (vaultProjects.length > 0) {
@@ -1749,7 +1848,6 @@
           noteProjectSelect.appendChild(projectsGroup);
         }
       } else {
-        // Si no estamos en una bóveda, mostrar proyectos globales
         const globalProjects = state.projects.filter(p => !p.vaultId);
         if (globalProjects.length > 0) {
           const projectsGroup = document.createElement('optgroup');
@@ -1784,38 +1882,26 @@
       }
     }
 
-    // Alias functions
     function renderProjects() { renderSidebarTree(); }
     function renderVaults() { renderSidebarTree(); }
 
-    // ---------- Carga ----------
-    async function loadProjects() {
-      await loadAllProjects();
-    }
-
-    // Cargar TODAS las notas para construir el árbol correctamente
     async function loadAllNotesForTree() {
       const params = new URLSearchParams();
-      // Solo filtrar por bóveda si estamos dentro de una
       if (state.currentVaultId) {
         params.set('vaultId', state.currentVaultId);
       }
-      // No filtrar por projectId aquí para que el árbol muestre todos los contadores
       const qs = params.toString();
       state.notes = await api.get('/api/notes' + (qs ? '?' + qs : ''));
     }
 
     async function loadNotes() {
-      // Cargar todas las notas para el árbol
       await loadAllNotesForTree();
 
-      // Filtrar notas para la vista de grid si estamos en un proyecto específico
       let displayNotes = state.notes;
       if (state.currentProjectId && state.currentProjectId !== 'all') {
         displayNotes = state.notes.filter(n => n.projectId === state.currentProjectId);
       }
 
-      // Aplicar filtros de búsqueda y tags
       if (state.search) {
         displayNotes = displayNotes.filter(n =>
           n.title.toLowerCase().includes(state.search.toLowerCase()) ||
@@ -1827,14 +1913,10 @@
         displayNotes = displayNotes.filter(n => n.tags && n.tags.includes(state.activeTag));
       }
 
-      // Renderizar árbol con TODAS las notas (para contadores correctos)
       renderSidebarTree();
-
-      // Renderizar grid solo con notas filtradas
       renderNotesGrid(displayNotes);
     }
 
-    // Nueva función para renderizar solo el grid con notas específicas
     function renderNotesGrid(notesToDisplay) {
       notesContainer.innerHTML = '';
       if (!notesToDisplay.length) {
@@ -1928,11 +2010,10 @@
       noteContent.value = note.content || '';
       noteTags.value = (note.tags || []).join(', ');
 
-      // Seleccionar proyecto o bóveda
       if (note.projectId) {
         noteProjectSelect.value = `p_${note.projectId}`;
       } else if (note.vaultId) {
-        noteProjectSelect.value = `v_${note.vaultId}`;
+        noteProjectSelect.value = `vault_${note.vaultId}`;
       }
 
       saveNoteBtn.textContent = 'Actualizar nota';
@@ -1962,53 +2043,36 @@
       if (!title) { toast('Falta el título', 'error'); return; }
       if (!containerValue) { toast('Selecciona un proyecto o bóveda', 'error'); return; }
 
-      // Parsear si es proyecto o bóveda
-      // containerValue puede ser: "p_xxx", "vault_v_xxx", etc.
       const payload = { title, content, tags };
 
       if (containerValue.startsWith('p_')) {
-        // Es un proyecto: p_xxx
-        const projectId = containerValue.substring(2); // Quitar "p_"
+        const projectId = containerValue.substring(2);
         payload.projectId = projectId;
-        // Si el proyecto pertenece a una bóveda, incluir el vaultId
         const project = state.projects.find(p => p.id === projectId);
         if (project && project.vaultId) {
           payload.vaultId = project.vaultId;
-          console.log(`✓ Proyecto de bóveda detectado: ${project.name} pertenece a vault ${project.vaultId}`);
         }
       } else if (containerValue.startsWith('vault_')) {
-        // Es una bóveda: vault_v_xxx
-        const vaultId = containerValue.substring(6); // Quitar "vault_"
+        const vaultId = containerValue.substring(6);
         payload.vaultId = vaultId;
-        console.log(`✓ Bóveda seleccionada directamente: ${vaultId}`);
       }
 
-      console.log('💾 Guardando nota con payload:', payload);
-      console.log('Contexto actual - Bóveda:', state.currentVaultId, 'Proyecto:', state.currentProjectId);
-
       try {
-        // Determinar si es nota en proyecto o bóveda para el mensaje
         const location = payload.vaultId && !payload.projectId ? 'la bóveda' : 'el proyecto';
-
         if (state.editingNoteId) {
-          console.log('✏️ Actualizando nota:', state.editingNoteId);
           await api.send('PUT', `/api/notes/${state.editingNoteId}`, payload);
           toast(`Nota actualizada en ${location}`, 'success');
         } else {
-          console.log('➕ Creando nueva nota');
           await api.send('POST', '/api/notes', payload);
           toast(`Nota guardada en ${location}`, 'success');
         }
         clearEditor();
         await loadNotes();
       } catch (err) {
-        console.error('❌ Error al guardar nota:', err);
-        console.error('Mensaje de error:', err.message);
         toast(err.message, 'error');
       }
     }
 
-    // ---------- Vista previa Markdown ----------
     let previewOpen = false;
     function updatePreview() {
       if (!previewOpen) return;
@@ -2029,49 +2093,32 @@
     });
     noteContent.addEventListener('input', updatePreview);
 
-    // ---------- Listeners ----------
+    // ---------- Event Listeners ----------
     saveNoteBtn.addEventListener('click', saveNote);
     cancelEditBtn.addEventListener('click', clearEditor);
 
-    // Modal listeners
     modalClose.addEventListener('click', closeViewModal);
     modalCloseBtn.addEventListener('click', closeViewModal);
     viewModal.addEventListener('click', (e) => {
       if (e.target === viewModal) closeViewModal();
     });
 
-    // Vault listeners
-    if (vaultUnlockBtn) {
-      vaultUnlockBtn.addEventListener('click', unlockVaultSubmit);
-    }
-    if (vaultUnlockPassword) {
-      vaultUnlockPassword.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter') unlockVaultSubmit();
-      });
-    }
-    if (vaultCancelBtn) {
-      vaultCancelBtn.addEventListener('click', closeVaultUnlock);
-    }
-    if (vaultUnlockModal) {
-      vaultUnlockModal.addEventListener('click', (e) => {
-        if (e.target === vaultUnlockModal) closeVaultUnlock();
-      });
-    }
+    vaultUnlockBtn.addEventListener('click', unlockVaultSubmit);
+    vaultUnlockPassword.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') unlockVaultSubmit();
+    });
+    vaultCancelBtn.addEventListener('click', closeVaultUnlock);
+    vaultUnlockModal.addEventListener('click', (e) => {
+      if (e.target === vaultUnlockModal) closeVaultUnlock();
+    });
 
+    createVaultClose.addEventListener('click', closeCreateVaultModal);
+    createVaultCancelBtn.addEventListener('click', closeCreateVaultModal);
+    createVaultFormModal.addEventListener('submit', createVault);
+    createVaultModal.addEventListener('click', (e) => {
+      if (e.target === createVaultModal) closeCreateVaultModal();
+    });
 
-    // Verificación de elementos
-    console.log('🔍 Verificando elementos del DOM:');
-    console.log('newItemForm:', newItemForm);
-    console.log('newItemType:', newItemType);
-    console.log('newItemName:', newItemName);
-    console.log('newItemPassword:', newItemPassword);
-    console.log('newItemBtn:', newItemBtn);
-
-    if (!newItemForm) {
-      console.error('❌ ERROR: newItemForm no encontrado. El formulario no funcionará.');
-    }
-
-    // Formulario unificado para proyecto/bóveda
     if (newItemType) {
       newItemType.addEventListener('change', () => {
         const isVault = newItemType.value === 'vault';
@@ -2081,76 +2128,53 @@
         newItemName.placeholder = isVault ? 'Nombre de la bóveda...' : 'Nombre del proyecto...';
         newItemPassword.placeholder = 'Contraseña (mín. 8 caracteres, sin números seguidos)...';
       });
-      console.log('✅ Event listener agregado a newItemType');
     }
 
     if (newItemForm) {
-      console.log('✅ Agregando listener al formulario newItemForm');
       newItemForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      console.log('✅ Formulario enviado');
+        e.preventDefault();
+        const type = newItemType.value;
+        const name = newItemName.value.trim();
+        const password = newItemPassword.value.trim();
 
-      const type = newItemType.value;
-      const name = newItemName.value.trim();
-      const password = newItemPassword.value.trim();
-
-      console.log('Tipo:', type, 'Nombre:', name, 'En bóveda:', state.currentVaultId);
-
-      if (!name) {
-        toast('Ingresa un nombre', 'error');
-        return;
-      }
-
-      try {
-        if (type === 'project') {
-          console.log('📁 Creando proyecto:', name, 'en bóveda:', state.currentVaultId || 'global');
-          const payload = { name };
-          if (state.currentVaultId) {
-            payload.vaultId = state.currentVaultId;
-          }
-          await api.send('POST', '/api/projects', payload);
-          toast('📁 Proyecto creado', 'success');
-          await loadProjectsForContext();
-        } else if (type === 'vault') {
-          // Validar contraseña de bóveda
-          const passwordError = validateVaultPassword(password);
-          if (passwordError) {
-            toast(passwordError, 'error');
-            return;
-          }
-          console.log('🔐 Creando bóveda:', name);
-          await api.send('POST', '/api/vaults', { name, password });
-          toast('🔐 Bóveda creada exitosamente', 'success');
-          await loadVaults();
+        if (!name) {
+          toast('Ingresa un nombre', 'error');
+          return;
         }
-        newItemName.value = '';
-        newItemPassword.value = '';
-        newItemType.value = 'project';
-        // Disparar evento change para actualizar UI del botón
-        newItemType.dispatchEvent(new Event('change', { bubbles: true }));
-        newItemPassword.style.display = 'none';
-      } catch (err) {
-        console.error('❌ Error:', err);
-        toast('Error: ' + err.message, 'error');
-      }
-      // Resetear formulario a modo proyecto
-      if (newItemType.value !== 'project') {
-        newItemType.value = 'project';
-        newItemType.dispatchEvent(new Event('change', { bubbles: true }));
-      }
-      });
-    } else {
-      console.error('❌ ERROR CRÍTICO: newItemForm es null. El formulario no puede funcionar.');
-    }
 
-    vaultUnlockPassword.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') unlockVaultSubmit();
-    });
-    vaultUnlockBtn.addEventListener('click', unlockVaultSubmit);
-    vaultCancelBtn.addEventListener('click', closeVaultUnlock);
-    vaultUnlockModal.addEventListener('click', (e) => {
-      if (e.target === vaultUnlockModal) closeVaultUnlock();
-    });
+        try {
+          if (type === 'project') {
+            const payload = { name };
+            if (state.currentVaultId) {
+              payload.vaultId = state.currentVaultId;
+            }
+            await api.send('POST', '/api/projects', payload);
+            toast('📁 Proyecto creado', 'success');
+            await loadProjectsForContext();
+          } else if (type === 'vault') {
+            const passwordError = validateVaultPassword(password);
+            if (passwordError) {
+              toast(passwordError, 'error');
+              return;
+            }
+            await api.send('POST', '/api/vaults', { name, password });
+            toast('🔐 Bóveda creada exitosamente', 'success');
+            await loadVaults();
+          }
+          newItemName.value = '';
+          newItemPassword.value = '';
+          newItemType.value = 'project';
+          newItemType.dispatchEvent(new Event('change', { bubbles: true }));
+          newItemPassword.style.display = 'none';
+        } catch (err) {
+          toast('Error: ' + err.message, 'error');
+        }
+        if (newItemType.value !== 'project') {
+          newItemType.value = 'project';
+          newItemType.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      });
+    }
 
     let searchTimer;
     searchInput.addEventListener('input', () => {
@@ -2161,7 +2185,6 @@
       }, 200);
     });
 
-    // Atajo: Cmd/Ctrl + Enter para guardar
     [noteTitle, noteContent, noteTags].forEach(el => {
       el.addEventListener('keydown', (e) => {
         if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
@@ -2188,12 +2211,24 @@
 
     // ---------- Init ----------
     (async () => {
-      try {
-        await loadAllProjects(); // Cargar TODOS los proyectos (globales + de bóvedas)
-        await loadVaults();
-        await loadNotes();
-      } catch (err) {
-        toast('Error cargando datos: ' + err.message, 'error');
+      const token = api.getToken();
+      if (token) {
+        try {
+          const user = await api.get('/api/auth/me');
+          state.isAuthenticated = true;
+          state.userId = user.id;
+          state.username = user.username;
+          userDisplay.textContent = user.username;
+          showAppScreen();
+          await loadAllProjects();
+          await loadVaults();
+          await loadNotes();
+        } catch (err) {
+          api.setToken(null);
+          showAuthScreen();
+        }
+      } else {
+        showAuthScreen();
       }
     })();
   })();

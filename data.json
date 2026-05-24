@@ -1,4 +1,12 @@
 {
+  "users": [
+    {
+      "id": "u_mpj2nrtg_j2vemt",
+      "username": "test",
+      "passwordHash": "$2a$10$/4df/lCXK5XAgsYXoDgK7eVHUoddHHMYTuR.oNA1BSSgg6ISJn42S",
+      "createdAt": "2026-05-24T01:01:34.228Z"
+    }
+  ],
   "projects": [],
   "vaults": [],
   "notes": []
