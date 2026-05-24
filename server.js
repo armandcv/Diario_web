@@ -43,7 +43,17 @@ if (!fs.existsSync(UPLOADS_DIR)) {
 }
 
 // ========== SEGURIDAD: Helmet para headers HTTP seguros ==========
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'"],
+    },
+  },
+}));
 
 // ========== SEGURIDAD: CORS configurado explícitamente (CRÍTICO) ==========
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000').split(',');
@@ -61,6 +71,11 @@ app.use(cors({
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Ruta raíz para servir index.html
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 // ========== SEGURIDAD: Rate limiting en endpoints de autenticación (CRÍTICO) ==========
 const loginLimiter = rateLimit({
