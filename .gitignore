@@ -1,14 +1,25 @@
+# Dependencias
 node_modules/
-.DS_Store
-*.log
 
-CAMBIOS_FINALES.md
-CHANGES_UPDATE.md
-CONSOLE_CHECK.md
-DEBUG_INSTRUCTIONS.md
-DEBUG_NOTA_EN_BOVEDA.md
-IMPLEMENTATION_SUMMARY.md
-NESTED_PROJECTS_TEST.md
-PASO_A_PASO.md
-VAULT_FIXES.md
-VAULT_GUIDE.md
+# Sistema
+.DS_Store
+.env
+.env.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+Thumbs.db
+
+# Desarrollo local
+.env.development
+.env.test

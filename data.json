@@ -1,31 +1,5 @@
 {
-  "projects": [
-    {
-      "id": "p_demo",
-      "name": "General",
-      "vaultId": null,
-      "createdAt": "2026-04-30T00:00:00.000Z"
-    },
-    {
-      "id": "p_mpizre2h_tmfcye",
-      "name": "Nuevo",
-      "vaultId": null,
-      "createdAt": "2026-05-23T23:40:24.185Z"
-    },
-    {
-      "id": "p_mpj101rh_cv0zq7",
-      "name": "Pruebita",
-      "vaultId": null,
-      "createdAt": "2026-05-24T00:15:07.757Z"
-    }
-  ],
-  "vaults": [
-    {
-      "id": "v_mpj0tw5q_l16g4p",
-      "name": "Nueva",
-      "passwordHash": "c101e6b087164772e4ad84a35317852bba3a0a7d4bd7ba11b40351377123a3a0:33f5dd4c8bfdb42add8e61f65d717345cc1afab12e0ca0ca3c155e1a0466341fe2cdeee69cbf004bc8c8c839fe334aa626876eeac858e81c6aad2b8aba73b9e5",
-      "createdAt": "2026-05-24T00:10:20.597Z"
-    }
-  ],
+  "projects": [],
+  "vaults": [],
   "notes": []
 }
