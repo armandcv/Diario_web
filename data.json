@@ -27,6 +27,13 @@
       "name": "hh",
       "vaultId": null,
       "createdAt": "2026-05-24T01:18:02.010Z"
+    },
+    {
+      "id": "p_mpkcvx3x_z83kz0",
+      "userId": "u_mpj2nrtg_j2vemt",
+      "name": "Otro proyecto mas",
+      "vaultId": null,
+      "createdAt": "2026-05-24T22:35:36.669Z"
     }
   ],
   "vaults": [],
@@ -52,6 +59,20 @@
       "tags": [],
       "createdAt": "2026-05-24T01:18:20.879Z",
       "updatedAt": "2026-05-24T01:18:20.879Z"
+    },
+    {
+      "id": "n_mpjhq2jj_9f51d1",
+      "userId": "u_mpj2nrtg_j2vemt",
+      "title": "Nota nueva",
+      "content": "# Esto es una nota nueva\n\n- Esta es una lista \n\n**Esto es un texto en negritas** \n\n*Esto es un texto en cursiva*\n\n`print \"Hola Mundo!\" \n`\n\n\n![Imagen](/uploads/u_mpj2nrtg_j2vemt_1779609776732_e9m87h.jpeg)",
+      "projectId": "p_mpj377ni_31ipgg",
+      "vaultId": null,
+      "tags": [
+        "Ideas",
+        "notas"
+      ],
+      "createdAt": "2026-05-24T08:03:15.679Z",
+      "updatedAt": "2026-05-24T08:03:15.679Z"
     }
   ]
 }

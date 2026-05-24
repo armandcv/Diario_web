@@ -1,10 +1,19 @@
 # Dependencias
 node_modules/
+package-lock.json
 
-# Sistema
-.DS_Store
+# 🔒 SEGURIDAD CRÍTICA: Variables de entorno (NUNCA SUBIR A GIT)
 .env
 .env.local
+.env.*.local
+.env.development
+.env.test
+
+# 🔒 Datos sensibles
+data.json
+*.key
+*.pem
+*.pub
 
 # Logs
 *.log
@@ -18,8 +27,9 @@ npm-debug.log*
 *~
 
 # OS
+.DS_Store
 Thumbs.db
 
-# Desarrollo local
-.env.development
-.env.test
+# Uploads en producción
+public/uploads/*
+!public/uploads/.gitkeep

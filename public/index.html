@@ -843,10 +843,16 @@
             <input type="text" id="createVaultNameInput" placeholder="Ej: Información privada" maxlength="60" required />
           </div>
           <div style="margin-bottom: 16px;">
-            <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px;">Contraseña maestra</label>
-            <input type="password" id="createVaultPasswordInput" placeholder="Mínimo 8 caracteres, sin números consecutivos" required />
+            <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px;">Contraseña maestra 🔒</label>
+            <input type="password" id="createVaultPasswordInput" placeholder="Ej: MiVault2025!" required />
             <div style="font-size: 12px; color: var(--text-dim); margin-top: 6px;">
-              💡 Debe tener mínimo 8 caracteres y no puede contener números consecutivos (ej: 12, 456). Se hashea con PBKDF2. Nunca se guarda en texto plano.
+              💡 <strong>Requisitos (CRÍTICO):</strong><br/>
+              ✓ Mínimo 12 caracteres<br/>
+              ✓ Mayúsculas (A-Z) + Minúsculas (a-z)<br/>
+              ✓ Números (0-9)<br/>
+              ✓ Caracteres especiales (!@#$%^&*)<br/>
+              Ej: "MiVault2025!" o "Admin@Secure1"<br/>
+              Se hashea con PBKDF2-SHA256. Nunca se guarda en texto plano.
             </div>
           </div>
           <div style="display: flex; gap: 8px; justify-content: flex-end;">
@@ -1223,12 +1229,27 @@
       createVaultPasswordInput.value = '';
     }
 
+    // SEGURIDAD MEJORADA: Validación más fuerte de contraseñas (CRÍTICO)
     function validateVaultPassword(password) {
-      if (password.length < 8) {
-        return 'La contraseña debe tener mínimo 8 caracteres';
+      // Mínimo 12 caracteres
+      if (password.length < 12) {
+        return 'Mínimo 12 caracteres';
       }
-      if (/\d(?=\d)/.test(password)) {
-        return 'La contraseña no puede contener números consecutivos (ej: 12, 456)';
+      // Requiere mayúsculas
+      if (!/[A-Z]/.test(password)) {
+        return 'Debe contener mayúsculas';
+      }
+      // Requiere minúsculas
+      if (!/[a-z]/.test(password)) {
+        return 'Debe contener minúsculas';
+      }
+      // Requiere números
+      if (!/[0-9]/.test(password)) {
+        return 'Debe contener números';
+      }
+      // Requiere caracteres especiales
+      if (!/[!@#$%^&*]/.test(password)) {
+        return 'Debe contener caracteres especiales (!@#$%^&*)';
       }
       return null;
     }

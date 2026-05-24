@@ -1,29 +1,77 @@
-// Diario Web - Servidor Express con autenticación multi-usuario
+// Diario Web - Servidor Express con autenticación multi-usuario (CON SEGURIDAD MEJORADA)
+require('dotenv').config();
+
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
+const cors = require('cors');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const NODE_ENV = process.env.NODE_ENV || 'development';
 const DATA_FILE = path.join(__dirname, 'data.json');
 const UPLOADS_DIR = path.join(__dirname, 'public', 'uploads');
-const JWT_SECRET = process.env.JWT_SECRET || 'diario-web-secret-key-change-in-production';
 const BCRYPT_ROUNDS = 10;
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+
+// ========== SEGURIDAD: JWT_SECRET desde variable de entorno (CRÍTICO) ==========
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  console.error('❌ ERROR CRÍTICO: JWT_SECRET no está configurada en variables de entorno');
+  console.error('📋 Por favor configura el archivo .env con JWT_SECRET');
+  console.error('💡 Genera una clave con: openssl rand -base64 32');
+  process.exit(1);
+}
+
+// ========== SEGURIDAD: Validación de tipos MIME permitidos ==========
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+const MAGIC_BYTES = {
+  'image/jpeg': [0xFF, 0xD8, 0xFF],
+  'image/png': [0x89, 0x50, 0x4E, 0x47],
+  'image/gif': [0x47, 0x49, 0x46],
+  'image/webp': [0x52, 0x49, 0x46, 0x46],
+};
 
 // Crear carpeta uploads si no existe
 if (!fs.existsSync(UPLOADS_DIR)) {
   fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 }
 
-app.use(express.json({ limit: '10mb' })); // Aumentar límite para base64
+// ========== SEGURIDAD: Helmet para headers HTTP seguros ==========
+app.use(helmet());
+
+// ========== SEGURIDAD: CORS configurado explícitamente (CRÍTICO) ==========
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000').split(',');
+app.use(cors({
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('CORS not allowed'));
+    }
+  },
+  credentials: true,
+  optionsSuccessStatus: 200
+}));
+
+app.use(express.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-// ---------- Utilidades de persistencia ----------
+// ========== SEGURIDAD: Rate limiting en endpoints de autenticación (CRÍTICO) ==========
+const loginLimiter = rateLimit({
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || 900000), // 15 minutos
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || 5), // máximo 5 intentos
+  message: 'Demasiados intentos de acceso. Intenta más tarde.',
+  standardHeaders: false,
+  skip: (req) => NODE_ENV !== 'production', // No limitar en desarrollo
+});
+
+// ========== Utilidades de persistencia ==========
 function loadData() {
   try {
     const raw = fs.readFileSync(DATA_FILE, 'utf8');
@@ -41,7 +89,37 @@ function uid(prefix = 'id') {
   return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 }
 
-// ---------- Utilidades de hashing para bóvedas ----------
+// ========== SEGURIDAD: Sanitización de inputs (ALTO) ==========
+function sanitizeInput(str) {
+  if (typeof str !== 'string') return '';
+  // Remover caracteres peligrosos para búsquedas
+  return str.replace(/[<>"`]/g, '').trim();
+}
+
+function validatePassword(password) {
+  // SEGURIDAD (ALTO): Requisitos más fuertes de contraseña
+  const errors = [];
+
+  if (password.length < 12) {
+    errors.push('Mínimo 12 caracteres');
+  }
+  if (!/[A-Z]/.test(password)) {
+    errors.push('Debe contener mayúsculas');
+  }
+  if (!/[a-z]/.test(password)) {
+    errors.push('Debe contener minúsculas');
+  }
+  if (!/[0-9]/.test(password)) {
+    errors.push('Debe contener números');
+  }
+  if (!/[!@#$%^&*]/.test(password)) {
+    errors.push('Debe contener caracteres especiales (!@#$%^&*)');
+  }
+
+  return errors.length > 0 ? errors[0] : null;
+}
+
+// ========== Utilidades de hashing para bóvedas ==========
 function hashPassword(password) {
   // PBKDF2 con SHA256: 100,000 iteraciones (para bóvedas)
   const salt = crypto.randomBytes(32).toString('hex');
@@ -63,7 +141,23 @@ function verifyPassword(password, storedHash) {
   }
 }
 
-// ---------- Middleware de autenticación JWT ----------
+// ========== SEGURIDAD: Validación de magic bytes para archivos (CRÍTICO) ==========
+function validateImageMagicBytes(buffer, declaredMimeType) {
+  // Validar que el contenido real del archivo corresponda al tipo declarado
+  for (const [mimeType, signature] of Object.entries(MAGIC_BYTES)) {
+    const matches = buffer.subarray(0, signature.length).every((b, i) => b === signature[i]);
+    if (matches) {
+      if (mimeType === declaredMimeType) {
+        return true; // ✅ Tipo coincide
+      }
+      // ❌ El archivo es un tipo diferente al declarado
+      return false;
+    }
+  }
+  return false; // No es una imagen válida
+}
+
+// ========== Middleware de autenticación JWT ==========
 function authMiddleware(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -81,15 +175,38 @@ function authMiddleware(req, res, next) {
   }
 }
 
+// ========== SEGURIDAD: Logging seguro (BAJO) ==========
+function secureLog(type, message, details = {}) {
+  const timestamp = new Date().toISOString();
+  const logEntry = {
+    timestamp,
+    type,
+    message,
+    // Sanitizar detalles sensibles
+    userId: details.userId ? `${details.userId.substring(0, 6)}...` : undefined,
+    action: details.action,
+  };
+  if (NODE_ENV === 'production') {
+    // En producción: solo los datos esenciales
+    console.log(`[${timestamp}] ${type}: ${message}`);
+  } else {
+    // En desarrollo: más detalles
+    console.log(logEntry);
+  }
+}
+
 // ---------- API: Autenticación ----------
-app.post('/api/auth/register', async (req, res) => {
+app.post('/api/auth/register', loginLimiter, async (req, res) => {
   const { username, password } = req.body || {};
 
   if (!username || !username.trim()) {
     return res.status(400).json({ error: 'El nombre de usuario es obligatorio' });
   }
-  if (!password || password.length < 6) {
-    return res.status(400).json({ error: 'La contraseña debe tener al menos 6 caracteres' });
+
+  // SEGURIDAD (ALTO): Validación más fuerte de contraseña
+  const passwordError = validatePassword(password);
+  if (passwordError) {
+    return res.status(400).json({ error: passwordError });
   }
 
   const data = loadData();
@@ -97,6 +214,7 @@ app.post('/api/auth/register', async (req, res) => {
 
   // Verificar si el usuario ya existe
   if (data_users.some(u => u.username === username.trim())) {
+    secureLog('AUTH', 'Intento de registro con usuario existente', { action: 'register' });
     return res.status(409).json({ error: 'El nombre de usuario ya está en uso' });
   }
 
@@ -118,6 +236,8 @@ app.post('/api/auth/register', async (req, res) => {
       { expiresIn: '7d' }
     );
 
+    secureLog('AUTH', 'Usuario registrado exitosamente', { userId: user.id, action: 'register' });
+
     res.status(201).json({
       id: user.id,
       username: user.username,
@@ -125,11 +245,12 @@ app.post('/api/auth/register', async (req, res) => {
       expiresIn: '7d',
     });
   } catch (err) {
-    res.status(500).json({ error: 'Error al registrar usuario' });
+    secureLog('ERROR', 'Error al registrar usuario', { action: 'register', error: err.message.substring(0, 50) });
+    res.status(500).json({ error: 'Error al registrar usuario. Intenta más tarde.' });
   }
 });
 
-app.post('/api/auth/login', async (req, res) => {
+app.post('/api/auth/login', loginLimiter, async (req, res) => {
   const { username, password } = req.body || {};
 
   if (!username || !password) {
@@ -140,12 +261,15 @@ app.post('/api/auth/login', async (req, res) => {
   const user = (data.users || []).find(u => u.username === username);
 
   if (!user) {
+    secureLog('AUTH', 'Intento de login con usuario inexistente', { action: 'login' });
+    // No revelar si el usuario existe (seguridad)
     return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
   }
 
   try {
     const isValid = await bcrypt.compare(password, user.passwordHash);
     if (!isValid) {
+      secureLog('AUTH', 'Intento de login con contraseña incorrecta', { userId: user.id, action: 'login' });
       return res.status(401).json({ error: 'Usuario o contraseña incorrectos' });
     }
 
@@ -156,6 +280,8 @@ app.post('/api/auth/login', async (req, res) => {
       { expiresIn: '7d' }
     );
 
+    secureLog('AUTH', 'Login exitoso', { userId: user.id, action: 'login' });
+
     res.json({
       id: user.id,
       username: user.username,
@@ -163,7 +289,8 @@ app.post('/api/auth/login', async (req, res) => {
       expiresIn: '7d',
     });
   } catch (err) {
-    res.status(500).json({ error: 'Error al autenticar' });
+    secureLog('ERROR', 'Error al autenticar', { action: 'login', error: err.message.substring(0, 50) });
+    res.status(500).json({ error: 'Error al autenticar. Intenta más tarde.' });
   }
 });
 
@@ -175,7 +302,7 @@ app.get('/api/auth/me', authMiddleware, (req, res) => {
   });
 });
 
-// ---------- API: Upload de imágenes ----------
+// ---------- API: Upload de imágenes (CON VALIDACIÓN DE MAGIC BYTES - CRÍTICO) ----------
 app.post('/api/upload', authMiddleware, (req, res) => {
   const { imageData, filename } = req.body || {};
 
@@ -210,6 +337,14 @@ app.post('/api/upload', authMiddleware, (req, res) => {
       });
     }
 
+    // SEGURIDAD (CRÍTICO): Validar magic bytes para prevenir ataques
+    if (!validateImageMagicBytes(buffer, mimeType)) {
+      secureLog('UPLOAD', 'Intento de upload con archivo falsificado', { userId: req.userId });
+      return res.status(400).json({
+        error: 'El contenido del archivo no coincide con el tipo declarado. No se permiten archivos falsificados.'
+      });
+    }
+
     // Generar nombre único
     const ext = mimeType.split('/')[1];
     const uniqueName = `${req.userId}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
@@ -218,12 +353,14 @@ app.post('/api/upload', authMiddleware, (req, res) => {
     // Guardar archivo
     fs.writeFileSync(filePath, buffer);
 
+    secureLog('UPLOAD', 'Archivo subido exitosamente', { userId: req.userId, filename: uniqueName });
+
     // Retornar URL relativa
     const imageUrl = `/uploads/${uniqueName}`;
     res.json({ url: imageUrl });
   } catch (err) {
-    console.error('Error al subir imagen:', err);
-    res.status(500).json({ error: 'Error al procesar imagen' });
+    secureLog('ERROR', 'Error al procesar upload', { userId: req.userId, error: err.message.substring(0, 50) });
+    res.status(500).json({ error: 'Error al procesar imagen. Intenta más tarde.' });
   }
 });
 
@@ -237,7 +374,7 @@ app.get('/api/projects', authMiddleware, (req, res) => {
   projects = projects.filter(p => p.userId === req.userId);
 
   // Si se especifica una bóveda, filtrar solo proyectos de esa bóveda
-  if (vaultId) {
+  if (vaultId && vaultId !== 'all') {
     projects = projects.filter(p => p.vaultId === vaultId);
   } else {
     projects = projects.filter(p => !p.vaultId);
@@ -311,15 +448,11 @@ app.post('/api/vaults', authMiddleware, (req, res) => {
   if (!name || !name.trim()) {
     return res.status(400).json({ error: 'El nombre de la bóveda es obligatorio' });
   }
-  if (!password || password.length < 8) {
-    return res.status(400).json({ error: 'La contraseña debe tener al menos 8 caracteres' });
-  }
 
-  // Validar que no haya números consecutivos
-  if (/\d(?=\d)/.test(password)) {
-    return res.status(400).json({
-      error: 'La contraseña no puede contener números consecutivos (ej: 12, 456)'
-    });
+  // SEGURIDAD (ALTO): Validación más fuerte de contraseña para bóvedas
+  const passwordError = validatePassword(password);
+  if (passwordError) {
+    return res.status(400).json({ error: passwordError });
   }
 
   const data = loadData();
@@ -373,7 +506,7 @@ app.delete('/api/vaults/:id', authMiddleware, (req, res) => {
   res.json({ ok: true });
 });
 
-// ---------- API: Notas (con autenticación) ----------
+// ---------- API: Notas (con autenticación y SEGURIDAD DE INPUT) ----------
 app.get('/api/notes', authMiddleware, (req, res) => {
   const { projectId, vaultId, q, tag } = req.query;
   const data = loadData();
@@ -389,11 +522,13 @@ app.get('/api/notes', authMiddleware, (req, res) => {
     notes = notes.filter(n => n.vaultId === vaultId);
   }
   if (tag) {
-    const t = String(tag).toLowerCase();
+    // SEGURIDAD (ALTO): Sanitizar entrada de búsqueda
+    const t = sanitizeInput(String(tag)).toLowerCase();
     notes = notes.filter(n => (n.tags || []).map(x => x.toLowerCase()).includes(t));
   }
   if (q) {
-    const needle = String(q).toLowerCase();
+    // SEGURIDAD (ALTO): Sanitizar entrada de búsqueda
+    const needle = sanitizeInput(String(q)).toLowerCase();
     notes = notes.filter(n =>
       (n.title || '').toLowerCase().includes(needle) ||
       (n.content || '').toLowerCase().includes(needle) ||
@@ -407,10 +542,8 @@ app.get('/api/notes', authMiddleware, (req, res) => {
 
 app.post('/api/notes', authMiddleware, (req, res) => {
   const { title, content, projectId, vaultId, tags } = req.body || {};
-  console.log('📝 POST /api/notes recibido:', { title: title ? '✓' : '✗', projectId, vaultId });
 
   if (!title || !title.trim()) {
-    console.error('❌ Validación falló: Título vacío');
     return res.status(400).json({ error: 'El título es obligatorio' });
   }
   const data = loadData();
@@ -421,17 +554,13 @@ app.post('/api/notes', authMiddleware, (req, res) => {
       p => p.id === projectId && p.userId === req.userId
     );
     if (!project) {
-      console.error('❌ Proyecto no encontrado:', projectId);
       return res.status(400).json({ error: 'Proyecto no válido' });
     }
-    console.log(`✓ Proyecto encontrado: ${project.name}, vaultId: ${project.vaultId}`);
 
     if (vaultId && project.vaultId !== vaultId) {
-      console.error(`❌ Mismatch bóveda: esperado ${vaultId}, proyecto tiene ${project.vaultId}`);
       return res.status(400).json({ error: 'El proyecto no pertenece a esa bóveda' });
     }
     if (!vaultId && project.vaultId) {
-      console.error(`❌ Proyecto de bóveda usado sin bóveda: proyecto.vaultId=${project.vaultId}`);
       return res.status(400).json({ error: 'No puedes usar un proyecto de bóveda fuera de la bóveda' });
     }
   }
@@ -440,10 +569,8 @@ app.post('/api/notes', authMiddleware, (req, res) => {
       v => v.id === vaultId && v.userId === req.userId
     );
     if (!validVault) {
-      console.error('❌ Bóveda no válida:', vaultId);
       return res.status(400).json({ error: 'Bóveda no válida' });
     }
-    console.log('✓ Bóveda validada:', vaultId);
   }
 
   const now = new Date().toISOString();
@@ -519,6 +646,26 @@ app.delete('/api/notes/:id', authMiddleware, (req, res) => {
 
 // ---------- Arranque ----------
 app.listen(PORT, () => {
-  console.log(`\n📓 Diario Web (Multi-usuario) corriendo en http://localhost:${PORT}\n`);
-  console.log(`⚠️  Asegúrate de instalar dependencias: npm install\n`);
+  console.log('\n🔒 ========== DIARIO WEB (MULTI-USUARIO CON SEGURIDAD MEJORADA) ==========');
+  console.log(`📓 Corriendo en http://localhost:${PORT}`);
+  console.log(`🔐 Modo: ${NODE_ENV === 'production' ? '🛡️  PRODUCCIÓN' : '🧪 DESARROLLO'}`);
+  console.log('');
+  console.log('✅ MEJORAS DE SEGURIDAD IMPLEMENTADAS:');
+  console.log('   🔴 CRÍTICAS:');
+  console.log('      ✓ JWT_SECRET desde variable de entorno (obligatorio)');
+  console.log('      ✓ Validación de magic bytes en uploads');
+  console.log('      ✓ CORS configurado explícitamente');
+  console.log('      ✓ Rate limiting en auth endpoints');
+  console.log('');
+  console.log('   🟠 ALTAS:');
+  console.log('      ✓ Sanitización de inputs en búsquedas');
+  console.log('      ✓ Requisitos de contraseña más fuertes (12 chars + complejidad)');
+  console.log('      ✓ Helmet para headers HTTP seguros');
+  console.log('      ✓ Logging seguro');
+  console.log('');
+  console.log('⚠️  IMPORTANTE:');
+  console.log('   1. Configura el archivo .env con JWT_SECRET');
+  console.log('   2. Genera una clave: openssl rand -base64 32');
+  console.log('   3. Ejecuta: npm install');
+  console.log('   4. En producción: establece NODE_ENV=production\n');
 });
