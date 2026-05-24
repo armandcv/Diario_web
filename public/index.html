@@ -807,9 +807,11 @@
         <div class="md-hint">
           Markdown: <code>**negrita**</code> · <code>*cursiva*</code> · <code># título</code> · <code>- lista</code> · <code>[texto](url)</code> · <code>`código`</code> · <code>```bloque```</code>
         </div>
-        <div class="row" style="align-items:center; margin-top:10px;">
-          <select id="noteProject"></select>
-          <div class="actions">
+        <div class="row" style="align-items:center; margin-top:10px; gap: 8px;">
+          <select id="noteProject" style="flex: 1;"></select>
+          <input type="file" id="imageUploadInput" accept="image/*" style="display: none;" />
+          <button class="secondary" id="uploadImageBtn" type="button" title="Subir imagen">🖼️ Imagen</button>
+          <div class="actions" style="margin-left: auto;">
             <button class="secondary" id="previewBtn" type="button">👁 Vista previa</button>
             <button class="secondary" id="cancelEditBtn" type="button" style="display:none;">Cancelar</button>
             <button id="saveNoteBtn" type="button">Guardar nota</button>
@@ -2183,6 +2185,65 @@
         state.search = searchInput.value.trim();
         loadNotes();
       }, 200);
+    });
+
+    // ---------- Upload de imágenes ----------
+    const imageUploadInput = $('#imageUploadInput');
+    const uploadImageBtn = $('#uploadImageBtn');
+
+    uploadImageBtn.addEventListener('click', () => {
+      imageUploadInput.click();
+    });
+
+    imageUploadInput.addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      // Validar tipo
+      if (!file.type.startsWith('image/')) {
+        toast('Solo se permiten archivos de imagen', 'error');
+        return;
+      }
+
+      // Validar tamaño (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast('La imagen es demasiado grande. Máximo 5MB', 'error');
+        return;
+      }
+
+      uploadImageBtn.disabled = true;
+      uploadImageBtn.textContent = '⏳ Subiendo...';
+
+      try {
+        // Leer archivo como base64
+        const reader = new FileReader();
+        reader.onload = async (event) => {
+          const imageData = event.target.result;
+
+          // Subir imagen
+          const result = await api.send('POST', '/api/upload', {
+            imageData,
+            filename: file.name
+          });
+
+          // Insertar markdown de imagen en el contenido
+          const markdown = `\n![Imagen](${result.url})\n`;
+          noteContent.value += markdown;
+          updatePreview();
+
+          toast('🖼️ Imagen subida correctamente', 'success');
+        };
+        reader.onerror = () => {
+          toast('Error al leer archivo', 'error');
+        };
+        reader.readAsDataURL(file);
+      } catch (err) {
+        toast(`Error al subir imagen: ${err.message}`, 'error');
+      } finally {
+        uploadImageBtn.disabled = false;
+        uploadImageBtn.textContent = '🖼️ Imagen';
+        imageUploadInput.value = '';
+      }
     });
 
     [noteTitle, noteContent, noteTags].forEach(el => {

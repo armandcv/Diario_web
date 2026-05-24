@@ -9,10 +9,18 @@ const bcrypt = require('bcryptjs');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const DATA_FILE = path.join(__dirname, 'data.json');
+const UPLOADS_DIR = path.join(__dirname, 'public', 'uploads');
 const JWT_SECRET = process.env.JWT_SECRET || 'diario-web-secret-key-change-in-production';
 const BCRYPT_ROUNDS = 10;
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 
-app.use(express.json({ limit: '1mb' }));
+// Crear carpeta uploads si no existe
+if (!fs.existsSync(UPLOADS_DIR)) {
+  fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+}
+
+app.use(express.json({ limit: '10mb' })); // Aumentar límite para base64
 app.use(express.static(path.join(__dirname, 'public')));
 
 // ---------- Utilidades de persistencia ----------
@@ -165,6 +173,58 @@ app.get('/api/auth/me', authMiddleware, (req, res) => {
     id: req.userId,
     username: req.username,
   });
+});
+
+// ---------- API: Upload de imágenes ----------
+app.post('/api/upload', authMiddleware, (req, res) => {
+  const { imageData, filename } = req.body || {};
+
+  if (!imageData || !filename) {
+    return res.status(400).json({ error: 'Imagen y nombre requeridos' });
+  }
+
+  try {
+    // Validar base64
+    const base64Match = imageData.match(/^data:([^;]+);base64,(.+)$/);
+    if (!base64Match) {
+      return res.status(400).json({ error: 'Formato de imagen inválido' });
+    }
+
+    const mimeType = base64Match[1];
+    const base64String = base64Match[2];
+
+    // Validar tipo de archivo
+    if (!ALLOWED_TYPES.includes(mimeType)) {
+      return res.status(400).json({
+        error: 'Tipo de archivo no permitido. Solo: JPEG, PNG, GIF, WebP'
+      });
+    }
+
+    // Convertir base64 a buffer
+    const buffer = Buffer.from(base64String, 'base64');
+
+    // Validar tamaño
+    if (buffer.length > MAX_FILE_SIZE) {
+      return res.status(400).json({
+        error: 'Archivo demasiado grande. Máximo 5MB'
+      });
+    }
+
+    // Generar nombre único
+    const ext = mimeType.split('/')[1];
+    const uniqueName = `${req.userId}_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
+    const filePath = path.join(UPLOADS_DIR, uniqueName);
+
+    // Guardar archivo
+    fs.writeFileSync(filePath, buffer);
+
+    // Retornar URL relativa
+    const imageUrl = `/uploads/${uniqueName}`;
+    res.json({ url: imageUrl });
+  } catch (err) {
+    console.error('Error al subir imagen:', err);
+    res.status(500).json({ error: 'Error al procesar imagen' });
+  }
 });
 
 // ---------- API: Proyectos (con autenticación) ----------
